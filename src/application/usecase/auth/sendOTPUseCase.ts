@@ -22,6 +22,7 @@ export class SendOTPUseCase{
             lowerCaseAlphabets: false,
             specialChars: false,
         });
+        console.log("otp", otpCode)
 
         const expiresAt = new Date(Date.now() + 1 * 60 * 1000)
         await this.otpRepo.saveOTP({email, otp: otpCode, expiresAt})

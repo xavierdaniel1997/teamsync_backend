@@ -16,10 +16,6 @@ const registerUserUseCase = new RegisterUserUseCase(userRepository)
 
 const sendOtpToEmail = async (req: Request, res: Response) => {
     try{
-        // const errors = validationResult(req);
-        // if (!errors.isEmpty()) {
-        //   sendResponse(res, 400, null, "Validation failed");
-        // }
         const { email } = req.body;
         await sentOtpUsecase.execute(email)
         sendResponse(res, 200, email, "OTP sent successfully")
@@ -49,13 +45,26 @@ const resendOtp = async (req: Request, res: Response) => {
 }
 
 const registerUser = async (req: Request, res: Response) => {
-    try{
-        const {email, fullName, password, cpassword, avtar} = req.body;
-        await registerUserUseCase.execute(email, fullName, password, cpassword, avtar)
-        sendResponse(res, 200, email, "user registration complete successfully")
+    try{   
+        const {email, fullName, password, cpassword, role, avatar} = req.body;
+        const result = await registerUserUseCase.execute({email, fullName, password, cpassword, role, avatar})
+        const {user, accessToken, refreshToken} = result
+
+
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict", 
+            maxAge: 2 * 24 * 60 * 60 * 1000,
+        })
+
+        res.setHeader("Authorization", `Bearer ${accessToken}`);
+
+        console.log("result of registerUserUseCase", result)
+        sendResponse(res, 200, {email, accessToken}, "user registration complete successfully")
     }catch(error: any){
         sendResponse(res, 400, null, error.message || "Failed to Register")
     }
 }
 
-export {sendOtpToEmail, verifyOtp, resendOtp, registerUser}
+export {sendOtpToEmail, verifyOtp, resendOtp, registerUser}     

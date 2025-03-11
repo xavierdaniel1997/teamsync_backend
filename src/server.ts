@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import connectDB from './config/connectDB';
 import apiRoute from './interfaces/routes/apiRoutes';
 import errorMiddleware from './interfaces/middleware/errorMiddleware';
+import cookieParser from 'cookie-parser';
 
 const app: Application = express()
 
@@ -10,7 +11,7 @@ const PORT: Number = 5000;
 
 dotenv.config()
 connectDB()
-
+app.use(cookieParser())
 app.use(express.json())
 
 app.get("/", (req:Request, res:Response) => {

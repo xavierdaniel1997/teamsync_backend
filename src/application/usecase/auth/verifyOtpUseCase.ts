@@ -1,5 +1,6 @@
 import { IOtpRepository } from "../../../domain/repositories/OTPRepo";
 import { IUserRepository } from "../../../domain/repositories/userRepo";
+import { IUser, UserRole } from "../../../domain/entities/user";
 
 export class VerifyOtpUseCase{
     constructor(
@@ -16,7 +17,7 @@ export class VerifyOtpUseCase{
             throw new Error("OTP has expired");
         }
 
-        await this.userRepo.createUser({email, isVerified: true, createdAt: new Date()})
+        await this.userRepo.createUser({email, isVerified: true, role: UserRole.VIEWER, createdAt: new Date()})
         await this.otpRepo.deleteOTP(email)
 
         return true;
