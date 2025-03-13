@@ -58,19 +58,16 @@ export class RegisterUserUseCase{
           }
 
           const accessToken = generateAccessToken(
-            userDetial._id.toString(),
+            userDetial._id,
             userDetial.role,
             userDetial.fullName
           );
 
           const refreshToken = generateRefreshToken(
-            userDetial._id.toString(),
+            userDetial._id,
             userDetial.role,
             userDetial.fullName
           )
-
-        //   console.log("Access Token:", accessToken)
-        //   console.log("RefreshToken:", refreshToken)
 
           return { user, accessToken, refreshToken };
     

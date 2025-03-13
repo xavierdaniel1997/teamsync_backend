@@ -2,6 +2,7 @@ import e from "express"
 import { IUser } from "../../domain/entities/user"
 import { IUserRepository } from "../../domain/repositories/userRepo"
 import UserModel from "../database/userModel"
+import mongoose from "mongoose"
 
 
 export class userRepositoryImp implements IUserRepository{
@@ -16,5 +17,10 @@ export class userRepositoryImp implements IUserRepository{
 
     async updateUser(email: string, data: Partial<IUser>): Promise<IUser | null> {
         return await UserModel.findOneAndUpdate({ email }, data, { new: true });
+    }
+
+    async findUserById(userId: string): Promise<IUser | null> {
+        // return await UserModel.findById(new mongoose.Types.ObjectId(userId))
+        return await UserModel.findById(userId)
     }
 }

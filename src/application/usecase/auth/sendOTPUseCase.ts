@@ -6,6 +6,7 @@ import otpGenerator from 'otp-generator';
 import bcrptjs from 'bcryptjs';
 import { EmailType, sendEmail } from "../../../interfaces/utils/emailService";
 
+
 export class SendOTPUseCase{
     constructor(
         private userRepo: IUserRepository,

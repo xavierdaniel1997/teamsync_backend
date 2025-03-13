@@ -16,7 +16,10 @@ const userSchema = new Schema<IUser & Document>({
     avatar: { type: String },
     isVerified: { type: Boolean, default: false },
     createdAt: { type: Date, default: Date.now },
-    isRegComplet: {type: Boolean, default: false}
+    isRegComplet: {type: Boolean, default: false},
+
+    resetPasswordToken: { type: String, default: null },  
+    resetPasswordExpires: { type: Date, default: null }
 });
 
 const UserModel = mongoose.model<IUser>("User", userSchema);

@@ -1,17 +1,3 @@
-// export type UserRole = "project_manager" | "developer" | "tester"
-
-// export interface IUser {
-//     id?: string;
-//     email: string;
-//     fullName?: string; 
-//     password?: string; 
-//     role?: UserRole;  
-//     avatar?: string;
-//     isVerified: boolean;
-//     createdAt: Date;
-// }
-
-
 
 export enum UserRole {
     PROJECT_MANAGER = "project_manager",
@@ -29,5 +15,8 @@ export interface IUser {
     avatar?: string;
     isVerified: boolean;
     createdAt: Date; 
-    isRegComplet?: boolean;                                    
+    isRegComplet?: boolean;  
+    
+    resetPasswordToken?: string;
+    resetPasswordExpires?: Date;
 }

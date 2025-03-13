@@ -13,7 +13,8 @@ const transporter = nodemailer.createTransport({
 
 export enum EmailType {
     OTP = 'OTP',
-    INVITE = 'INVITE'
+    INVITE = 'INVITE',
+    FORGOTPASSWORD = "FORGOTPASSWORD"
 }
 
 
@@ -30,6 +31,15 @@ const emailTemplates = {
         html: `<p><strong>${data.sender}</strong> has invited you to join the team "<strong>${"data.teamName"}</strong>".</p>
                <p>Click the link below to accept:</p>
                <a href="https://yourapp.com/invite">Accept Invitation</a>`,
+    }),
+
+    [EmailType.FORGOTPASSWORD]: (data: { resetLink: string }) => ({
+        subject: 'Password Reset Request',
+        text: `You requested a password reset. Click the link below to reset your password: ${data.resetLink}. If you did not request this, please ignore this email.`,
+        html: `<p>You requested a password reset.</p>
+               <p>Click the link below to reset your password:</p>
+               <a href="${data.resetLink}" target="_blank">Reset Password</a>
+               <p>If you did not request this, please ignore this email.</p>`,
     })
 }
 
