@@ -17,4 +17,40 @@ const register = async (req: Request, res: Response): Promise<void> => {
     }
 }
 
-export {register}
+
+const adminLogin = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { email, password } = req.body;
+        const result = await authUseCase.loginAdmin(email, password)
+        const { admin, accessToken, refreshToken } = result
+
+
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 2 * 24 * 60 * 60 * 1000,
+        })
+
+        res.setHeader("Authorization", `Bearer ${accessToken}`);
+        sendResponse(res, 200, { admin, accessToken }, "user login successfully")
+    } catch (error: any) {
+        sendResponse(res, 400, null, error.message || "Failed to Login")
+    }
+}
+
+const adminLogout = async (req: Request, res: Response): Promise<void> => {
+    try {
+        res.clearCookie("refreshToken", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+        });
+
+        sendResponse(res, 200, null, "Admin logged out successfully");
+    } catch (error: any) {
+        sendResponse(res, 500, null, "Logout failed");
+    }
+};
+
+export {register, adminLogin, adminLogout}
