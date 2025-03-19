@@ -49,7 +49,7 @@ export class ForgotPasswordUseCase {
             resetPasswordExpires: resetExpires,
         });
 
-        const resetLink = `http://localhost:5000/reset-password/${resetToken}`;
+        const resetLink = `http://localhost:5173/reset-password/${resetToken}/${email}`;
 
         await sendEmail(email, EmailType.FORGOTPASSWORD, { resetLink });
     }

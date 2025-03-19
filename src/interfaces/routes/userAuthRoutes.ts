@@ -1,5 +1,5 @@
 import express from 'express'
-import {forgetPswViaEmail,  loginUser, logoutUser, refreshAccessToken, registerUser, resendOtp, resetPassword, sendOtpToEmail, verifyOtp} from '../controller/user/auth/userRegistration'
+import {forgetPswViaEmail,  googleLogin,  loginUser, logoutUser, refreshAccessToken, registerUser, resendOtp, resetPassword, sendOtpToEmail, verifyOtp} from '../controller/user/auth/userRegistration'
 
 import { userEmailValidator } from '../../application/validator/userRegisterEmailValidator'
 import { userCompleteValidator } from '../../application/validator/userCompleteValidator'
@@ -14,6 +14,8 @@ router.post("/resend-Otp", resendOtp)
 router.post("/register", userCompleteValidator, validateRequestMiddleware, registerUser)
 router.post("/loginUser", userLoginValidator, validateRequestMiddleware, loginUser)
 router.post("/logout", logoutUser)
+
+router.post("/google", googleLogin)
 
 
 router.post("/forgotPasswordEmail", forgetPswViaEmail)

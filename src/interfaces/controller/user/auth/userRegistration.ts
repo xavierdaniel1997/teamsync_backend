@@ -9,6 +9,8 @@ import { validationResult } from "express-validator";
 import { LoginUserUseCase } from "../../../../application/usecase/auth/loginUserUseCase";
 import { ForgotPasswordUseCase } from "../../../../application/usecase/auth/forgotPasswordUseCase";
 import { RefreshTokenUseCase } from "../../../../application/usecase/auth/refreshTokenUseCase";
+import { GoogleLoginUseCase } from "../../../../application/usecase/auth/googleLoginUseCase";
+
 
 
 const otpRepository = new OtpRepositoryImp()
@@ -19,6 +21,7 @@ const registerUserUseCase = new RegisterUserUseCase(userRepository)
 const loginUserUseCase = new LoginUserUseCase(userRepository)
 const forgotPasswordUseCase = new ForgotPasswordUseCase(userRepository, otpRepository)
 const refreshTokenUseCase = new RefreshTokenUseCase(userRepository)
+const googleLoginUseCase = new GoogleLoginUseCase(userRepository)
 
 const sendOtpToEmail = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -140,7 +143,7 @@ const resetPassword = async(req: Request, res: Response):Promise<void> => {
     try{
         const { token, } = req.params
         const {email , newPassword, cpassword } = req.body; 
-
+        console.log("resetpasswrod", req.body, token)
         // if (!token || !email) {
         //      res.status(400).json({ message: "Token and email are required" });
         //      return 
@@ -164,4 +167,26 @@ const refreshAccessToken = async(req: Request, res: Response):Promise<void> => {
     }
 }
 
-export { sendOtpToEmail, verifyOtp, resendOtp, registerUser, loginUser, logoutUser, resetPassword, forgetPswViaEmail, refreshAccessToken}     
+
+const googleLogin = async(req: Request, res: Response): Promise<void> => {
+    try{
+        const { access_token } = req.body;
+        // console.log("googleLogin", req.body) 
+        if (!access_token) throw new Error("Access token not provided");
+        const result = await googleLoginUseCase.execute(access_token)
+        const {user, refreshToken, accessToken} = result;
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 2 * 24 * 60 * 60 * 1000,
+        })
+        res.setHeader("Authorization", `Bearer ${accessToken}`);
+        sendResponse(res, 200, { user, accessToken }, "user login successfully")
+    }catch(error: any){
+        sendResponse(res, 400, null, error.message || "Failed to Login")
+    }
+
+}
+
+export { sendOtpToEmail, verifyOtp, resendOtp, registerUser, loginUser, logoutUser, resetPassword, forgetPswViaEmail, refreshAccessToken, googleLogin}     
