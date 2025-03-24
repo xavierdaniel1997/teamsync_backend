@@ -77,6 +77,7 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
 const loginUser = async (req: Request, res: Response): Promise<void> => {
     try {
         const { email, password } = req.body;
+        console.log("login data", req.body)
         const result = await loginUserUseCase.execute({ email, password })
         const { userData, accessToken, refreshToken } = result
 
@@ -141,7 +142,7 @@ const forgetPswViaEmail = async(req: Request, res: Response): Promise<void> => {
 
 const resetPassword = async(req: Request, res: Response):Promise<void> => {
     try{
-        const { token, } = req.params
+        const { token, } = req.params  
         const {email , newPassword, cpassword } = req.body; 
         console.log("resetpasswrod", req.body, token)
         // if (!token || !email) {
