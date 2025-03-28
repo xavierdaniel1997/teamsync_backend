@@ -77,7 +77,6 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
 const loginUser = async (req: Request, res: Response): Promise<void> => {
     try {
         const { email, password } = req.body;
-        console.log("login data", req.body)
         const result = await loginUserUseCase.execute({ email, password })
         const { userData, accessToken, refreshToken } = result
 
@@ -110,25 +109,6 @@ const logoutUser = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
-// const forgotPassword = async (req: Request, res: Response) => {
-//     try {
-//         const { email } = req.body;
-//         await forgotPasswordUseCase.forgotPswOtp(email)
-//         sendResponse(res, 200, null, "OTP sent successfully")
-//     } catch (error: any) {
-//         sendResponse(res, 400, null, error.message || "Something went wrong")
-//     }
-// }
-
-// const resetPassword = async(req: Request, res: Response) => {
-//     try{
-//         const {email, newPassword, cpassword} = req.body;
-//         await forgotPasswordUseCase.resetPasswrod(email, newPassword, cpassword)
-//         sendResponse(res, 200, null, "Password reset successfully") 
-//     }catch(error: any){
-//         sendResponse(res, 400, null, error.message || "Something went wrong")
-//     }
-// }
 
 const forgetPswViaEmail = async(req: Request, res: Response): Promise<void> => {
     try{
@@ -145,10 +125,6 @@ const resetPassword = async(req: Request, res: Response):Promise<void> => {
         const { token, } = req.params  
         const {email , newPassword, cpassword } = req.body; 
         console.log("resetpasswrod", req.body, token)
-        // if (!token || !email) {
-        //      res.status(400).json({ message: "Token and email are required" });
-        //      return 
-        // }
         await forgotPasswordUseCase.resetPswEmail(email as string, token as string, newPassword, cpassword)
         sendResponse(res, 200, null, "Password reset successfully")
     }catch(error: any){
@@ -160,6 +136,7 @@ const resetPassword = async(req: Request, res: Response):Promise<void> => {
 const refreshAccessToken = async(req: Request, res: Response):Promise<void> => {
     try{
         const refreshToken = req.cookies.refreshToken;
+        console.log("refreshToken from the cookies", refreshToken)
         const {accessToken} = await refreshTokenUseCase.execute(refreshToken)
         res.setHeader("Authorization", `Bearer ${accessToken}`);
         sendResponse(res, 200, { accessToken }, "Access token refreshed");
@@ -172,7 +149,6 @@ const refreshAccessToken = async(req: Request, res: Response):Promise<void> => {
 const googleLogin = async(req: Request, res: Response): Promise<void> => {
     try{
         const { access_token } = req.body;
-        // console.log("googleLogin", req.body) 
         if (!access_token) throw new Error("Access token not provided");
         const result = await googleLoginUseCase.execute(access_token)
         const {user, refreshToken, accessToken} = result;

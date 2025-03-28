@@ -7,12 +7,13 @@ export enum WorkSpacePlan {
 }
 
 export interface IWorkspace{
-    id?: string,
-    name: string,
+    _id?: string;
+    name: string;
     owner: Types.ObjectId;
     members: Types.ObjectId[];
     projects: Types.ObjectId[];
     teams: Types.ObjectId[];
     plan: WorkSpacePlan;
+    subscription: Types.ObjectId | null;
     createdAt: Date;
 }

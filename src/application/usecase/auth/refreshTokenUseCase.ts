@@ -14,7 +14,7 @@ export class RefreshTokenUseCase {
         const decoded: any = verifyRefreshToken(refreshToken)
         console.log("decoded data from the refreshTokenUseCase", decoded)
         console.log("Type of userId:", typeof decoded.userId, decoded.userId);
-        const userDetial = await this.userRepo.findUserById(decoded.userId)
+        const userDetial = await this.userRepo.findUserById(decoded.userId) 
         console.log("this is the data form the userDetials", userDetial)
         if (!userDetial) {
             throw new Error("User not found");

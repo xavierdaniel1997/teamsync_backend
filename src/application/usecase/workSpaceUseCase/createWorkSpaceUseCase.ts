@@ -20,11 +20,10 @@ export class CreateWorkSpaceUseCase{
             projects: [],
             teams: [],
             plan: WorkSpacePlan.FREE,
+            subscription: null,
             createdAt: new Date()
         };
-        // console.log("workspce data created befor saving", workspaceData)
         const createWorkSpace = await this.workSpaceResp.createSpace(workspaceData)
-        // console.log("work space create result for the createWorkSpace", createWorkSpace)
         return createWorkSpace;
     }
 }

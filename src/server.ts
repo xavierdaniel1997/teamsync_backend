@@ -5,6 +5,7 @@ import apiRoute from './interfaces/routes/apiRoutes';
 import errorMiddleware from './interfaces/middleware/errorMiddleware';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import { handleWebhook } from './interfaces/controller/user/subscriptions/webhookController';
 
 const app: Application = express()
 
@@ -19,8 +20,9 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"]
 }))
 
-app.use(express.json())
 
+app.post("/api/webhook", express.raw({type: "application/json"}), handleWebhook)
+app.use(express.json())
 app.get("/", (req:Request, res:Response) => {
     res.json({message: "teamsync server test message"})
 })

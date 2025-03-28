@@ -23,7 +23,6 @@ export class GoogleLoginUseCase {
                 },
             }
         );
-        console.log("Google User Info:", userInfo);
         const email = userInfo.email;
         const fullName = userInfo.name;
         const avatar = userInfo.picture;

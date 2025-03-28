@@ -15,6 +15,7 @@ const workSpaceSchem = new Schema<IWorkspace & Document>({
     enum: Object.values(WorkSpacePlan),
     default: WorkSpacePlan.FREE,
   },
+  subscription: { type: Schema.Types.ObjectId, ref: "Subscription", default: null },
   createdAt: {type: Date, default: Date.now},
 });
 

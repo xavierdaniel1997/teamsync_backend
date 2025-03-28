@@ -53,4 +53,16 @@ const adminLogout = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
-export {register, adminLogin, adminLogout}
+
+const refreshAdminAccessToken = async(req: Request, res: Response):Promise<void> => {
+    try{
+        const refreshToken = req.cookies.refreshToken;
+        const {accessToken} = await authUseCase.adminRefreshTokenUseCase(refreshToken)
+        res.setHeader("Authorization", `Bearer ${accessToken}`);
+        sendResponse(res, 200, { accessToken }, "Access token refreshed");
+    }catch(error: any){
+        sendResponse(res, 403, null, error.message || "Failed to refresh token");
+    }
+}
+
+export {register, adminLogin, adminLogout, refreshAdminAccessToken}

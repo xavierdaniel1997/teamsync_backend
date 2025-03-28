@@ -11,7 +11,14 @@ export class WorkSpaceRepositoryImp implements IWorkSpaceRepo{
     }
 
     async findWorkSpaceByOwner(ownerId: string): Promise<IWorkspace | null> {
-        const result = await WorkSpaceModel.findOne({owner: new Types.ObjectId(ownerId)})
+        // const result = await WorkSpaceModel.findOne({owner: new Types.ObjectId(ownerId)})
+        const result = await WorkSpaceModel.findOne({owner: ownerId})
         return result;
+    }
+
+    async updateWorkSpace(id: string, workspace: Partial<IWorkspace>): Promise<IWorkspace> {
+        const updated = await WorkSpaceModel.findByIdAndUpdate(id, workspace, {new: true})
+        if (!updated) throw new Error("Workspace not found");
+        return updated;
     }
 }
