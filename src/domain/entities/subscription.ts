@@ -8,7 +8,7 @@ export enum PlanStatus{
 
 
 export interface ISubscription {
-    id?: string;
+    _id?: string;    
     user: Types.ObjectId;
     workspace: Types.ObjectId;
     plan: Types.ObjectId;

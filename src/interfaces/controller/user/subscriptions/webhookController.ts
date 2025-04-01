@@ -4,11 +4,13 @@ import { HandleWebhookUseCase } from "../../../../application/usecase/subscripti
 import { SubscriptionRepositoryImp } from "../../../../infrastructure/repositories/subscriptionRepositoryImp";
 import { PlanRepositoryImp } from "../../../../infrastructure/repositories/planRepositoryImp";
 import stripe from "../../../../config/stripe";
+import { WorkSpaceRepositoryImp } from "../../../../infrastructure/repositories/workSpaceRepositoryImp";
 
 const subscriptionRepo = new SubscriptionRepositoryImp()
 const planRepository = new PlanRepositoryImp()
+const workspaeRepo = new WorkSpaceRepositoryImp()
 
-const handleWebhookUseCase = new HandleWebhookUseCase(subscriptionRepo, planRepository, stripe)
+const handleWebhookUseCase = new HandleWebhookUseCase(subscriptionRepo, planRepository,workspaeRepo, stripe)
 
 const handleWebhook = async (
   req: Request,

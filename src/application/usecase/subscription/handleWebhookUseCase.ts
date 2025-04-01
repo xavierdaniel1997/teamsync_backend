@@ -4,11 +4,13 @@ import { ISubscriptionRepo } from "../../../domain/repositories/subscriptionRepo
 import stripe from "../../../config/stripe";
 import { Types } from "mongoose";
 import { ISubscription, PlanStatus } from "../../../domain/entities/subscription";
+import { IWorkSpaceRepo } from "../../../domain/repositories/workSpaceRepo";
 
 export class HandleWebhookUseCase {
     constructor(
         private subscriptionRepo: ISubscriptionRepo,
         private planRepo: IPlanRepository,
+        private workSpaceRepo: IWorkSpaceRepo,
         private stripe: Stripe
     ) { }
 
@@ -51,6 +53,8 @@ export class HandleWebhookUseCase {
                 };
 
                 const subscription = await this.subscriptionRepo.createOrUpdate(subscriptionDetails);
+                if (!subscription._id) throw new Error("Subscription ID is undefined");
+            await this.workSpaceRepo.updateWorkspaceSubscription(workspaceId, subscription._id.toString());
                 console.log("Paid subscription created via webhook:", subscription);
                 break;
 

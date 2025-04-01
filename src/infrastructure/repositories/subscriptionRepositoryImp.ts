@@ -10,7 +10,7 @@ export class SubscriptionRepositoryImp implements ISubscriptionRepo{
     async createOrUpdate(subscription: ISubscription): Promise<ISubscription> {
         const existing = await this.findByWorkspace(subscription.workspace.toString());
         if (existing) {
-            return await SubscriptionModel.findByIdAndUpdate(existing?.id, subscription, { new: true }) as ISubscription;
+            return await SubscriptionModel.findByIdAndUpdate(existing?._id, subscription, { new: true }) as ISubscription;
         }
         const newSubscription = new SubscriptionModel(subscription);
         return await newSubscription.save();

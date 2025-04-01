@@ -25,12 +25,12 @@ const emailTemplates = {
         html: `<p>Your OTP code is <strong>${data.otp}</strong>. It is valid for 1 minutes.</p>`,
     }),
 
-    [EmailType.INVITE]: (data: {sender: string, temeName: string}) => ({
-        subject: 'You Have Been Invited to a Team!',
-        text: `${data.sender} has invited you to join the team "${"data.teamName"}". Click the link below to accept the invitation.`,
-        html: `<p><strong>${data.sender}</strong> has invited you to join the team "<strong>${"data.teamName"}</strong>".</p>
+    [EmailType.INVITE]: (data: { sender: string, teamName: string, inviteLink: string }) => ({
+        subject: "You Have Been Invited to a Team!",
+        text: `${data.sender} has invited you to join the team "${data.teamName}". Click the link below to accept the invitation: ${data.inviteLink}`,
+        html: `<p><strong>${data.sender}</strong> has invited you to join the team "<strong>${data.teamName}</strong>".</p>
                <p>Click the link below to accept:</p>
-               <a href="https://yourapp.com/invite">Accept Invitation</a>`,
+               <a href="${data.inviteLink}">Accept Invitation</a>`,
     }),
 
     [EmailType.FORGOTPASSWORD]: (data: { resetLink: string }) => ({
