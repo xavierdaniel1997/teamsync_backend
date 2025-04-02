@@ -14,5 +14,6 @@ export const isAuth = (req: Request, res: Response, next: NextFunction) => {
         next();
     }catch(error: any){
         sendResponse(res, 401, null, "Invalid token")
+        console.log("error form the auth middleware", error)
     }
 }

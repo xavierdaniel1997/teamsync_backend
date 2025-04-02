@@ -94,12 +94,12 @@ export class CreateProjectUseCase {
                 await this.invitationRepo.create(invitation)
 
                 const inviteLink = `http://localhost:5173/invite/accept?token=${token}`;
-                const sendmail = await sendEmail(email, EmailType.INVITE, {
-                    sender: workspace.owner.toString(),  
+                const mailsend = await sendEmail(email, EmailType.INVITE, {
+                    sender: "The Admin",  
                     teamName: name,                     
                     inviteLink,                          
                 });
-                console.log("mail send sendmail")
+                console.log("mail send sendmail", mailsend)
             }
         }
 

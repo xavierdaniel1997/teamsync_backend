@@ -6,5 +6,5 @@ export interface IWorkSpaceRepo{
     updateWorkSpace(id: string, workspace:Partial<IWorkspace>): Promise<IWorkspace>;
     updateWorkspaceSubscription(workspaceId: string, subscriptionId: string): Promise<IWorkspace>;
     updateWorkspaceProjects(workspaceId: string, projectId: string): Promise<IWorkspace>
-    updateWorkspaceMembers(workspaceId: string, userId: string): Promise<void>;
+    updateWorkspaceMembers(workspaceId: string, userId: string): Promise<IWorkspace>;
 }

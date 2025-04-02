@@ -16,7 +16,6 @@ export interface IUser {
     isVerified: boolean;
     createdAt: Date; 
     isRegComplet?: boolean;  
-    
     resetPasswordToken?: string;
     resetPasswordExpires?: Date;
 }

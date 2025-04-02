@@ -41,12 +41,15 @@ export class WorkSpaceRepositoryImp implements IWorkSpaceRepo {
         return updatedWorkspace
     }
 
-    async updateWorkspaceMembers(workspaceId: string, userId: string): Promise<void> {
+    async updateWorkspaceMembers(workspaceId: string, userId: string): Promise<IWorkspace> {
+        console.log("calling the function", workspaceId, userId)
         const result = await WorkSpaceModel.findByIdAndUpdate(
             workspaceId,
             { $push: { members: userId } },
             { new: true }
         );
         if (!result) throw new Error("Workspace not found");
+        console.log("updateworkspacemembers", result)
+        return result
     }
 }
