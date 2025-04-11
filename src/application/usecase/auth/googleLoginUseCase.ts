@@ -41,7 +41,7 @@ export class GoogleLoginUseCase {
           };
     
           user = await this.userRepo.createUser(newUser);
-        }
+        }   
 
         if (!user._id || !user.role || !user.fullName) {
           throw new Error("Missing user data");

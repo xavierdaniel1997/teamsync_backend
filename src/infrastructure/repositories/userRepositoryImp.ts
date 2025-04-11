@@ -20,7 +20,6 @@ export class userRepositoryImp implements IUserRepository{
     }
 
     async findUserById(userId: string): Promise<IUser | null> {
-        // return await UserModel.findById(new mongoose.Types.ObjectId(userId))
-        return await UserModel.findById(userId)
+        return await UserModel.findById(userId).select("-password")
     }
 }

@@ -7,12 +7,13 @@ import projectAndTeamRoute from "./projectAndTeamRoutes"
 
 import adminAuthRoute from './adminAuthRoutes'
 import planRoute from "./planRoutes";
+import adminUserManagmentRoute from "./adminUserManagmentRoutes"
 
 const router = express.Router()
 
 router.use("/auth", userAuthRoute)
 
-router.use("/edit", userProfileRoute)
+router.use("/user", userProfileRoute)
 router.use("/workSpace", workSpaceRoute)
 router.use("/subscriptions", subscribeRoute)
 router.use("/project", projectAndTeamRoute)
@@ -21,5 +22,6 @@ router.use("/project", projectAndTeamRoute)
 
 router.use("/auth", adminAuthRoute)
 router.use("/admin", planRoute)
+router.use("/user-managment", adminUserManagmentRoute)
 
 export default router;   

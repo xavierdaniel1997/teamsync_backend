@@ -7,4 +7,6 @@ export interface IWorkSpaceRepo{
     updateWorkspaceSubscription(workspaceId: string, subscriptionId: string): Promise<IWorkspace>;
     updateWorkspaceProjects(workspaceId: string, projectId: string): Promise<IWorkspace>
     updateWorkspaceMembers(workspaceId: string, userId: string): Promise<IWorkspace>;
+    findById(workspaceId: string): Promise<IWorkspace | null>
+    findWorkspacesByMember(userId: string): Promise<IWorkspace[]>
 }

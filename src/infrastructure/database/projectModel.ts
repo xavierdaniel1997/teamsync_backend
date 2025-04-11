@@ -17,6 +17,8 @@ const projectSchema = new Schema<IProject>({
             },
         },
     ],
+    backlog: [{ type: Schema.Types.ObjectId, ref: "Task", default: [] }],
+    sprints: [{ type: Schema.Types.ObjectId, ref: "Sprint", default: [] }],
     createdAt: { type: Date, default: Date.now },
 })
 

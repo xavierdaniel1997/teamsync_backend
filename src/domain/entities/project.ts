@@ -15,5 +15,7 @@ export interface IProject {
     workspace: Types.ObjectId;
     owner: Types.ObjectId;
     members: { user: Types.ObjectId; accessLevel: ProjectAccessLevel }[];
+    backlog?: string[];
+    sprints?: string[];
     createdAt: Date;
 }

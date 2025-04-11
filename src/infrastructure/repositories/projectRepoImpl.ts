@@ -20,6 +20,13 @@ export class ProjectRepoImpl implements IProjectRepo {
             { $push: { members: { user: userId, accessLevel } } },
             { new: true }
         ).populate("members.user");
+    }
 
+    async findByWorkspace(workspaceId: string): Promise<IProject[]> {
+        const result = await ProjectModel.find({ workspace: workspaceId })
+            .populate("owner", "fullName email")
+            .populate("members.user", "fullName email")
+            .populate("workspace", "name");
+        return result;
     }
 }
