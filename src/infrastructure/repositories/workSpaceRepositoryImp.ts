@@ -35,7 +35,7 @@ export class WorkSpaceRepositoryImp implements IWorkSpaceRepo {
       {subscription: new Types.ObjectId(subscriptionId)},
       {new: true}
     );
-    console.log("from the updateworkspce subscription", updatedWorkspace);
+    // console.log("from the updateworkspce subscription", updatedWorkspace);
     if (!updatedWorkspace) throw new Error("Workspace not found");
     return updatedWorkspace;
   }
@@ -58,14 +58,14 @@ export class WorkSpaceRepositoryImp implements IWorkSpaceRepo {
     workspaceId: string,
     userId: string
   ): Promise<IWorkspace> {
-    console.log("calling the function", workspaceId, userId);
+    // console.log("calling the function", workspaceId, userId);
     const result = await WorkSpaceModel.findByIdAndUpdate(
       workspaceId,
       {$push: {members: userId}},
       {new: true}
     );
     if (!result) throw new Error("Workspace not found");
-    console.log("updateworkspacemembers", result);
+    // console.log("updateworkspacemembers", result);
     return result;
   }
 

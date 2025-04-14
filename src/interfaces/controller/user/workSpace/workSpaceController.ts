@@ -17,7 +17,7 @@ const createWorkSpace = async (req: Request, res: Response) => {
     try{
         const userId = (req as any).user?.userId;
         const {name} = req.body;
-        console.log("req.body", req.body.data)
+        // console.log("req.body", req.body.data)
         const newWorkSpace = await createWorkSpaceUseCase.execute(name, userId)
         sendResponse(res, 200, {workspaceId: newWorkSpace._id}, "Workspace created successfully")
     }catch(error: any){

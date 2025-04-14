@@ -6,12 +6,14 @@ import errorMiddleware from './interfaces/middleware/errorMiddleware';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { handleWebhook } from './interfaces/controller/user/subscriptions/webhookController';
+import { configureCloudinary } from './config/cloudinary';
 
 const app: Application = express()
 
 const PORT: Number = 5000;
 
 dotenv.config()
+configureCloudinary();
 connectDB()
 app.use(cookieParser())
 app.use(cors({

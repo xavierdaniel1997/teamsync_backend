@@ -16,7 +16,7 @@ export class userRepositoryImp implements IUserRepository{
     }
 
     async updateUser(email: string, data: Partial<IUser>): Promise<IUser | null> {
-        return await UserModel.findOneAndUpdate({ email }, data, { new: true });
+        return await UserModel.findOneAndUpdate({ email }, data, { new: true }).select('-password');
     }
 
     async findUserById(userId: string): Promise<IUser | null> {

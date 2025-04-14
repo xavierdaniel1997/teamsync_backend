@@ -7,6 +7,7 @@ import { WorkSpaceRepositoryImp } from "../../../../infrastructure/repositories/
 import { GetWorkSpaceUseCase } from "../../../../application/usecase/workSpaceUseCase/getWorkSpaceUseCase";
 import { GetInvitedWorkspacesUseCase } from "../../../../application/usecase/workSpaceUseCase/getInvitedWorkspacesUseCase";
 import { IWorkspace } from "../../../../domain/entities/workSpace";
+import { deleteFromCloudinary, uploadToCloudinary } from "../../../utils/uploadAssets";
 
 const userRepository = new userRepositoryImp()
 const workspaceRepo = new WorkSpaceRepositoryImp()
@@ -18,13 +19,44 @@ const getInvitedWorkSpaceUseCase = new GetInvitedWorkspacesUseCase(workspaceRepo
 const updateProfile = async (req: Request, res: Response): Promise<void> => {
     try {
         const userId = (req as any).user?.userId;
-        // console.log("userId is ", (req as any).user)
+
         if (!userId) {
             throw new Error("Unauthorized: User ID missing");
         }
-        const { email, fullName, avatar } = req.body
-        const result = await updateProfileUseCase.execute({ userId, email, fullName, avatar })
-        sendResponse(res, 200, result, "User profile updated successfully")
+        const existingUser = await userRepository.findUserById(userId);
+        // console.log("req body of update profile", req.body)
+        const { email, fullName, secondName } = req.body
+        const updateData: any = { userId, email, fullName, secondName };
+        // console.log("emai fullName lastName ", email, fullName, secondName)
+        if (req.files && (req.files as any).avatar) {
+            const avatarFile = (req.files as any).avatar[0];
+            if (existingUser?.avatar) {
+                await deleteFromCloudinary(existingUser.avatar);
+            }
+            updateData.avatar = await uploadToCloudinary(avatarFile, {
+                folder: 'TeamSyncAssets',
+                width: 1920,
+                height: 600,
+                quality: 90,
+                crop: 'scale',
+                resource_type: 'image',
+            });
+        }
+
+        if (req.files && (req.files as any).coverPhoto) {
+            const coverFile = (req.files as any).coverPhoto[0];
+            if (existingUser?.coverPhoto) {
+                await deleteFromCloudinary(existingUser.coverPhoto);
+            }
+            updateData.coverPhoto = await uploadToCloudinary(coverFile, {
+                folder: 'TeamSyncAssets',
+                width: 1200,
+                height: 400,
+                resource_type: 'image',
+            })
+        }
+        const result = await updateProfileUseCase.execute(updateData)
+        sendResponse(res, 200, null, "User profile updated successfully")
     } catch (error: any) {
         sendResponse(res, 400, null, error.message || "Something went wrong")
     }

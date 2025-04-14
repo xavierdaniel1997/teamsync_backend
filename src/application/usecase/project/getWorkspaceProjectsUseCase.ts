@@ -12,7 +12,6 @@ export class GetWorkspaceProjectsUseCase{
 
     async execute(workspaceId: string, userId: string): Promise<IProject[]> {
         const workspace = await this.workspaceRepo.findById(workspaceId)
-        console.log("workspace", workspace)
         if(!workspace){ 
             throw new Error("Workspace not found")
         }
@@ -23,7 +22,6 @@ export class GetWorkspaceProjectsUseCase{
         }
 
         const isWorkspaceMember = workspace.members.some((memberId) => memberId.toString() === userId) || workspace.owner.toString() === userId;
-        console.log("isWorkspaceMember", isWorkspaceMember)
         if(!isWorkspaceMember){
             throw new Error("User is not part of this workspace")
         }
@@ -32,17 +30,15 @@ export class GetWorkspaceProjectsUseCase{
         if(!allProjects){
             throw new Error("Failed to get allprojects")
         }
-        console.log("all project from the workspace", allProjects)
 
         const userProjects = allProjects.filter((project: IProject) => {     
             const isOwner = project.owner._id.toString() === userId;
             const isMember = project.members.some((member) => member.user._id.toString() ===
                  userId);
-            console.log(`Project ${project.name}: isOwner=${isOwner}, isMember=${isMember}`);
+            // console.log(`Project ${project.name}: isOwner=${isOwner}, isMember=${isMember}`);
             return isOwner || isMember;
         });
 
-        console.log("userProjects detials", userProjects)
 
         return userProjects;
 

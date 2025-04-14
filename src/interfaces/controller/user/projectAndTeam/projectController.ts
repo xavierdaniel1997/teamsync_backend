@@ -35,13 +35,13 @@ const createProject = async (req: Request, res: Response) => {
 
 
 const getProjects = async (req: Request, res: Response): Promise<void> => {
-    const workspaceId = req.query.workspaceId as string; 
-    console.log("workspace data from req.query", workspaceId);
+    const workspaceId = req.query.workspaceId as string;
     // const {workspaceId} = req.body;
     // console.log("workspace data form req.body", req.body) 
     try{
         const userId = (req as any).user?.userId;
         const result = await getWorkspaceProjectsUseCase.execute(workspaceId, userId)
+        console.log("result form the project controller all project", result)
         sendResponse(res, 200, result, "successfull get projects detials")
     }catch(error: any){ 
         sendResponse(res, 400, null, error.message ||"Failed to fetch the projects detials")
