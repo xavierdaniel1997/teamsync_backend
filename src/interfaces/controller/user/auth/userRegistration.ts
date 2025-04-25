@@ -57,7 +57,7 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
     try {
         const { email, fullName, password, cpassword, role, avatar } = req.body;
         const result = await registerUserUseCase.execute({ email, fullName, password, cpassword, role, avatar })
-        const { user, accessToken, refreshToken } = result
+        const { userDetial, accessToken, refreshToken } = result
 
 
         res.cookie("refreshToken", refreshToken, {
@@ -68,7 +68,7 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
         })
 
         res.setHeader("Authorization", `Bearer ${accessToken}`);
-        sendResponse(res, 200, { user, accessToken }, "user registration complete successfully")
+        sendResponse(res, 200, { userDetial, accessToken }, "user registration complete successfully")
     } catch (error: any) {
         sendResponse(res, 400, null, error.message || "Failed to Register")
     }

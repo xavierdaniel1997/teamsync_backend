@@ -4,12 +4,12 @@ import { ITask, TaskPriority, TaskStatus, TaskType } from "../../domain/entities
 const taskSchema = new Schema<ITask & Document>({
   project: { type: Schema.Types.ObjectId, ref: "Project", required: true },
   workspace: { type: Schema.Types.ObjectId, ref: "WorkSpace", required: true },
-  key: { type: String, required: true, unique: true },
+  taskKey: { type: String, required: true, unique: true },
   title: { type: String, required: true },
   description: { type: String },
   type: {
     type: String,
-    enum: Object.values(TaskType),
+    enum: Object.values(TaskType), 
     required: true,
   },
   status: {
@@ -23,14 +23,45 @@ const taskSchema = new Schema<ITask & Document>({
     default: TaskPriority.MEDIUM,
   },
   assignee: { type: Schema.Types.ObjectId, ref: "User" },
-//   reporter: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  reporter: { type: Schema.Types.ObjectId, ref: "User", required: true },
   epic: { type: Schema.Types.ObjectId, ref: "Task" },
   parent: { type: Schema.Types.ObjectId, ref: "Task" },
   sprint: { type: Schema.Types.ObjectId, ref: "Sprint" },
   storyPoints: { type: Number },
+  files: [{
+    url: { type: String, required: true },
+    publicId: { type: String, required: true },
+    fileName: { type: String, required: true },
+    fileType: { type: String, required: true },
+    size: { type: Number, required: true },
+    uploadedAt: { type: Date, default: Date.now }
+  }],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
+
+
+const TaskModel =  mongoose.model<ITask>("Task", taskSchema);
+export default TaskModel;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // taskSchema.pre("save", function (next) {
 //   this.updatedAt = new Date();
@@ -38,5 +69,3 @@ const taskSchema = new Schema<ITask & Document>({
 // });
 
 // taskSchema.index({ project: 1, sprint: 1, status: 1 });
-
-export default mongoose.model<ITask>("Task", taskSchema);

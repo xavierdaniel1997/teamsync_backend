@@ -12,7 +12,7 @@ export class userDetialUseCase{
             throw new Error("User not found");
         }
 
-        console.log("userDetilas", userDetails)
+        // console.log("userDetilas", userDetails)
 
         return userDetails
     }

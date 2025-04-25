@@ -20,7 +20,7 @@ export class RegisterUserUseCase{
         private userRepo: IUserRepository,
     ){}
 
-    async execute(userData: UserRegisterDTO): Promise<{user: IUser; accessToken: string; refreshToken: string}>{
+    async execute(userData: UserRegisterDTO): Promise<{userDetial: IUser; accessToken: string; refreshToken: string}>{
         const { email, fullName, password, cpassword, role, avatar } = userData;
 
         const user = await this.userRepo.findByEmail(email)
@@ -69,7 +69,7 @@ export class RegisterUserUseCase{
             userDetial.fullName
           )
 
-          return { user, accessToken, refreshToken };
+          return { userDetial, accessToken, refreshToken };
     
     }  
 

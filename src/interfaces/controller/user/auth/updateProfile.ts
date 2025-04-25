@@ -35,10 +35,10 @@ const updateProfile = async (req: Request, res: Response): Promise<void> => {
             }
             updateData.avatar = await uploadToCloudinary(avatarFile, {
                 folder: 'TeamSyncAssets',
-                width: 1920,
-                height: 600,
+                width: 400,
+                height: 400,
                 quality: 90,
-                crop: 'scale',
+                crop: 'fill',
                 resource_type: 'image',
             });
         }
@@ -50,8 +50,10 @@ const updateProfile = async (req: Request, res: Response): Promise<void> => {
             }
             updateData.coverPhoto = await uploadToCloudinary(coverFile, {
                 folder: 'TeamSyncAssets',
-                width: 1200,
-                height: 400,
+                width: 1600,
+                height: 500,
+                quality: 90,
+                crop: 'fill',
                 resource_type: 'image',
             })
         }

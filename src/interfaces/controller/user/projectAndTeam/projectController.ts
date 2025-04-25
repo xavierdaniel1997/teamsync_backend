@@ -41,7 +41,6 @@ const getProjects = async (req: Request, res: Response): Promise<void> => {
     try{
         const userId = (req as any).user?.userId;
         const result = await getWorkspaceProjectsUseCase.execute(workspaceId, userId)
-        console.log("result form the project controller all project", result)
         sendResponse(res, 200, result, "successfull get projects detials")
     }catch(error: any){ 
         sendResponse(res, 400, null, error.message ||"Failed to fetch the projects detials")
@@ -53,6 +52,7 @@ const getProjectById = async (req: Request, res: Response): Promise<void> => {
     try{
         const userId = (req as any).user?.userId;
         const result = await getSingleProjectUseCase.execute(userId, projectId)
+        // console.log("result of getProjectById from the project controller", result)
         sendResponse(res, 200, result, "successfully get project detilas")
     }catch(error: any){
         sendResponse(res, 400, null, error.message ||"Failed to fetch the project detials")

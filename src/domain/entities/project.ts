@@ -17,5 +17,6 @@ export interface IProject {
     members: { user: Types.ObjectId; accessLevel: ProjectAccessLevel }[];
     backlog?: string[];
     sprints?: string[];
+    taskCounter: number;
     createdAt: Date;
 }

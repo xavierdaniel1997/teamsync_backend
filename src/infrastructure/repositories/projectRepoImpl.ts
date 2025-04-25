@@ -11,7 +11,7 @@ export class ProjectRepoImpl implements IProjectRepo {
         return await ProjectModel.findById(projectId)
             .populate("workspace")
             .populate("owner")
-            .populate("members.user");
+            .populate("members.user").select("-password");
     }
 
     async addMember(projectId: string, userId: string, accessLevel: ProjectAccessLevel): Promise<IProject | null> {
@@ -19,7 +19,7 @@ export class ProjectRepoImpl implements IProjectRepo {
             projectId,
             { $push: { members: { user: userId, accessLevel } } },
             { new: true }
-        ).populate("members.user");
+        ).populate("members.user").select("-password");
     }
 
     async findByWorkspace(workspaceId: string): Promise<IProject[]> {
@@ -29,4 +29,25 @@ export class ProjectRepoImpl implements IProjectRepo {
             .populate("workspace", "name");
         return result;
     }
+
+
+    async findUserAccess(projectId: string, userId: string): Promise<IProject | null> {
+        return await ProjectModel.findOne({
+            _id: projectId,
+            $or: [{owner: userId}, { "members.user": userId }]
+        })
+    }
+
+
+    async incrementTaskCounter(projectId: string): Promise<IProject> {
+        const project = await ProjectModel.findByIdAndUpdate(
+          projectId,
+          { $inc: { taskCounter: 1 } },
+          { new: true }
+        ).exec();
+        if (!project) {
+          throw new Error("Project not found");
+        }
+        return project;
+      }
 }

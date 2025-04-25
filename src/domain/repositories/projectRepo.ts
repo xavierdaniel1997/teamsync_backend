@@ -5,4 +5,6 @@ export interface IProjectRepo{
     findById(projectId: string): Promise<IProject | null>;
     addMember(projectId: string, userId: string, accessLevel: ProjectAccessLevel): Promise<IProject | null>;
     findByWorkspace(workspaceId: string): Promise<IProject[]>
+    findUserAccess(projectId: string, userId: string): Promise<IProject | null>
+    incrementTaskCounter(projectId: string): Promise<IProject>;
 }
