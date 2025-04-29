@@ -43,29 +43,3 @@ const taskSchema = new Schema<ITask & Document>({
 
 const TaskModel =  mongoose.model<ITask>("Task", taskSchema);
 export default TaskModel;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// taskSchema.pre("save", function (next) {
-//   this.updatedAt = new Date();
-//   next();
-// });
-
-// taskSchema.index({ project: 1, sprint: 1, status: 1 });

@@ -1,4 +1,4 @@
-import { ITask } from "../../domain/entities/task";
+import { ITask, TaskType } from "../../domain/entities/task";
 import { ITaskRepository } from "../../domain/repositories/taskRepository";
 import TaskModel from "../database/taskModel";
 
@@ -26,4 +26,15 @@ export class ITaskRepositoryImp implements ITaskRepository {
           type: "EPIC",
         })
       }
+
+    async findBacklogTasks(projectId: string): Promise<ITask[]> {
+        return TaskModel.find({
+            project: projectId,
+            sprint: { $exists: false },
+            type: { $nin: [TaskType.EPIC, TaskType.SUBTASK] },
+        })
+        .populate("assignee").select("-password")
+        .populate("reporter").select("-password")
+        .exec();
+    }
 }

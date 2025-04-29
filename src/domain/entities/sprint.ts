@@ -1,3 +1,5 @@
+import { Types } from "mongoose";
+
 export enum SprintStatus {
     PLANNED = "PLANNED",
     ACTIVE = "ACTIVE",
@@ -5,9 +7,9 @@ export enum SprintStatus {
   }
   
   export interface ISprint {
-    id?: string;
-    project: string;
-    workspace: string;
+    _id?: string;
+    project: Types.ObjectId | string;
+    workspace: Types.ObjectId | string;
     name: string;
     goal?: string;
     startDate?: Date;
@@ -15,4 +17,5 @@ export enum SprintStatus {
     status: SprintStatus;
     tasks: string[];
     createdAt: Date;
+    updatedAt: Date;
   }

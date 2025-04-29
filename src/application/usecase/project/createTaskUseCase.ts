@@ -14,7 +14,7 @@ export class CreateTaskUseCase {
         private workspaceRepo: IWorkSpaceRepo,
     ) { }
 
-    async execute(dto: CreateTaskDTO, userId: string): Promise<void> {
+    async execute(dto: CreateTaskDTO, userId: string): Promise<ITask> {
         // console.log("this is also form the create task use case dto.project", dto.project)
 
         const workspace = await this.workspaceRepo.findById(dto.workspace);
@@ -62,6 +62,7 @@ export class CreateTaskUseCase {
         };
 
         const task = await this.taskRepo.create(taskData)
+        return task;
         // console.log("created task", task)
     }
 }

@@ -14,7 +14,7 @@ export interface IProject {
     description?: string;
     workspace: Types.ObjectId;
     owner: Types.ObjectId;
-    members: { user: Types.ObjectId; accessLevel: ProjectAccessLevel }[];
+    members: { user: Types.ObjectId; accessLevel: ProjectAccessLevel, }[];
     backlog?: string[];
     sprints?: string[];
     taskCounter: number;

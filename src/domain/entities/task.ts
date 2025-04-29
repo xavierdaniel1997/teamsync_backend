@@ -3,6 +3,7 @@ import { Types } from "mongoose";
 export enum TaskType {
     EPIC = "EPIC",
     STORY = "STORY",
+    TASK = "TASK",
     SUBTASK = "SUBTASK",
     BUG = "BUG",
 }
@@ -10,7 +11,10 @@ export enum TaskType {
 export enum TaskStatus {
     TO_DO = "TO_DO",
     IN_PROGRESS = "IN_PROGRESS",
+    IN_REVIEW = "IN_REVIEW",    
     DONE = "DONE",
+    BLOCKED = "BLOCKED",           
+    TESTING = "TESTING",  
 }
 
 export enum TaskPriority {
