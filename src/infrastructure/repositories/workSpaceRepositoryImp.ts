@@ -1,6 +1,6 @@
-import {Types} from "mongoose";
-import {IWorkspace} from "../../domain/entities/workSpace";
-import {IWorkSpaceRepo} from "../../domain/repositories/workSpaceRepo";
+import { Types } from "mongoose";
+import { IWorkspace } from "../../domain/entities/workSpace";
+import { IWorkSpaceRepo } from "../../domain/repositories/workSpaceRepo";
 import WorkSpaceModel from "../database/workSpaceModel";
 
 export class WorkSpaceRepositoryImp implements IWorkSpaceRepo {
@@ -11,7 +11,7 @@ export class WorkSpaceRepositoryImp implements IWorkSpaceRepo {
 
   async findWorkSpaceByOwner(ownerId: string): Promise<IWorkspace | null> {
     // const result = await WorkSpaceModel.findOne({owner: new Types.ObjectId(ownerId)})
-    const result = await WorkSpaceModel.findOne({owner: ownerId});
+    const result = await WorkSpaceModel.findOne({ owner: ownerId });
     return result;
   }
 
@@ -32,8 +32,8 @@ export class WorkSpaceRepositoryImp implements IWorkSpaceRepo {
   ): Promise<IWorkspace> {
     const updatedWorkspace = await WorkSpaceModel.findByIdAndUpdate(
       workspaceId,
-      {subscription: new Types.ObjectId(subscriptionId)},
-      {new: true}
+      { subscription: new Types.ObjectId(subscriptionId) },
+      { new: true }
     );
     // console.log("from the updateworkspce subscription", updatedWorkspace);
     if (!updatedWorkspace) throw new Error("Workspace not found");
@@ -46,8 +46,8 @@ export class WorkSpaceRepositoryImp implements IWorkSpaceRepo {
   ): Promise<IWorkspace> {
     const updatedWorkspace = await WorkSpaceModel.findByIdAndUpdate(
       workspaceId,
-      {$push: {projects: projectId}},
-      {new: true}
+      { $push: { projects: projectId } },
+      { new: true }
     );
     if (!updatedWorkspace)
       throw new Error("Workspace not found and not able to add project");
@@ -61,8 +61,8 @@ export class WorkSpaceRepositoryImp implements IWorkSpaceRepo {
     // console.log("calling the function", workspaceId, userId);
     const result = await WorkSpaceModel.findByIdAndUpdate(
       workspaceId,
-      {$push: {members: userId}},
-      {new: true}
+      { $push: { members: userId } },
+      { new: true }
     );
     if (!result) throw new Error("Workspace not found");
     // console.log("updateworkspacemembers", result);
@@ -74,8 +74,18 @@ export class WorkSpaceRepositoryImp implements IWorkSpaceRepo {
   }
 
   async findWorkspacesByMember(userId: string): Promise<IWorkspace[]> {
-    return await WorkSpaceModel.find({members: userId})
-    .populate("owner", "fullName email")
+    return await WorkSpaceModel.find({ members: userId })
+      .populate("owner", "fullName email")
     // .populate("projects")
+  }
+
+
+  async findAllWorkspaces(): Promise<IWorkspace[]> {
+    const result = await WorkSpaceModel.find()
+      .populate("owner", "fullName secondName avatar email")
+      .populate("members", "fullName secondName avatar email")
+      .populate("projects")
+      .populate("subscription");
+    return result
   }
 }

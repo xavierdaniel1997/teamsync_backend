@@ -13,6 +13,7 @@ import { EmailType, sendEmail } from "../../../interfaces/utils/emailService";
 interface CreateProjectDTO {
     name: string;
     projectkey: string;
+    title?: string;
     description?: string;
     workspaceId: string;
     userId: string;
@@ -30,24 +31,22 @@ export class CreateProjectUseCase {
     ) { }
 
     async execute(projectData: CreateProjectDTO): Promise<IProject> {
-        const { name, projectkey, description, workspaceId, userId, emails = [], accessLevel = ProjectAccessLevel.READ} = projectData;
+        const { name, projectkey, title, description, workspaceId, userId, emails = [], accessLevel = ProjectAccessLevel.READ} = projectData;
 
         const workspace = await this.workSpaceRepo.findWorkSpaceByOwner(userId)
-        console.log("workspace form the project usecase", workspace)
+        // console.log("workspace form the project usecase", workspace)
         if (!workspace || workspace._id?.toString() !== workspaceId) {
             throw new Error("Workspace not found or user lacks permission");
         }
-
+   
         const subscription = await this.subscriptionRepo.findByWorkspace(workspaceId);
-        console.log("subscription form the projct usecase", subscription)
+        // console.log("subscription form the projct usecase", subscription)
         if (!subscription || !subscription.plan) {
             throw new Error("No active subscription found");
         }
 
         const planId = subscription.plan as any;  
-
         const plan = await this.planRepo.findById(planId)
-        console.log("plan form the project plannnnnnnnnnnnn", plan)
         if (!plan) {
             throw new Error("Plan not found");
         }
@@ -59,20 +58,22 @@ export class CreateProjectUseCase {
      
         const projectDetails: Partial<IProject> = {
             name,
-            projectkey,              
+            projectkey, 
+            title,             
             description,
             workspace: new Types.ObjectId(workspaceId),
             owner: new Types.ObjectId(userId),
             members: [{user: new Types.ObjectId(userId), accessLevel: ProjectAccessLevel.OWNER}],
+            invitations: [],
             createdAt: new Date()
         }
 
-        // console.log("project created befor db", projectDetails)
+
         const project = await this.projectRepo.create(projectDetails)
-        // console.log("project create and saved in db", project)
+ 
 
         await this.workSpaceRepo.updateWorkspaceProjects(workspaceId, project._id!.toString());
-
+        const invitationIds: Types.ObjectId[] = [];
         if(emails.length > 0){
             for(const email of emails){
                 const token = uuidv4();
@@ -90,8 +91,14 @@ export class CreateProjectUseCase {
                     expiresAt,
                     createdAt: new Date(),
                 }
-                console.log("created invitation", invitation)
-                await this.invitationRepo.create(invitation)
+                const createdInvitation = await this.invitationRepo.create(invitation)
+                console.log("invited result", createdInvitation);
+                // Ensure _id is a Types.ObjectId
+                const invitationId = createdInvitation._id instanceof Types.ObjectId
+                    ? createdInvitation._id
+                    : new Types.ObjectId(createdInvitation._id);
+                invitationIds.push(invitationId);
+                console.log("invitationId pushed:", invitationId.toString()); // Debugging
 
                 const inviteLink = `http://localhost:5173/invite/accept?token=${token}`;
                 const mailsend = await sendEmail(email, EmailType.INVITE, {
@@ -99,10 +106,29 @@ export class CreateProjectUseCase {
                     teamName: name,                     
                     inviteLink,                          
                 });
-                console.log("mail send sendmail", mailsend)
+            }
+            // console.log("invitationIdssssssssssssssssssssss", invitationIds)
+            // await this.projectRepo.update(project._id!.toString(), {
+            //     $push: { invitations: { $each: invitationIds } },
+            // });
+            console.log("invitationIds:", invitationIds.map(id => id.toString())); // Debugging
+            // Ensure ObjectId instances in $push
+            const updateResult = await this.projectRepo.update(project._id!.toString(), {
+                $push: { invitations: { $each: invitationIds } },
+            });
+            console.log("Update result:", updateResult); // Debugging
+            if (!updateResult || !updateResult.invitations || updateResult.invitations.length !== invitationIds.length) {
+                throw new Error(`Failed to add invitation IDs to project. Expected ${invitationIds.length} invitations, got ${updateResult?.invitations?.length || 0}`);
             }
         }
 
-        return project;
+        const updatedProject = await this.projectRepo.findById(project._id!.toString());
+        if (!updatedProject) {
+            throw new Error("Failed to fetch updated project");
+        }
+
+        return updatedProject;
+
+        // return project;
     }
 }

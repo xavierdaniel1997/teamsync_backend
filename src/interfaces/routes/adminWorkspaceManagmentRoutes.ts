@@ -7,4 +7,4 @@ const router = express.Router()
 
 router.get("/workspaces", isAdmin, isAuth, getAllWorkspaces)
 
-export default router;
+export default router;     

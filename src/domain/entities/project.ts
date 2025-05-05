@@ -1,4 +1,5 @@
 import { Types } from "mongoose";
+import { IInvitation } from "./invitation";
 
 export enum ProjectAccessLevel {
     OWNER = "OWNER",
@@ -12,9 +13,12 @@ export interface IProject {
     projectkey: string;
     name: string;
     description?: string;
+    title?: string;
+    projectCoverImg?: string;
     workspace: Types.ObjectId;
     owner: Types.ObjectId;
     members: { user: Types.ObjectId; accessLevel: ProjectAccessLevel, }[];
+    invitations?: IInvitation[];
     backlog?: string[];
     sprints?: string[];
     taskCounter: number;

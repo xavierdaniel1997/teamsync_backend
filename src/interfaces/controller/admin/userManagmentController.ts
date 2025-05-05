@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import { sendResponse } from "../../utils/sendResponse"
-import {  AdminUserManagmentRepoImp } from "../../../infrastructure/repositories/AdminUserManagmentRepoImp"
+import { AdminUserManagmentRepoImp } from "../../../infrastructure/repositories/adminUserManagmentRepoImp"
 import { UserManagmentUseCase } from "../../../application/usecase/adminUseCase/userManagmentUseCase"
 
 const adminUserManagmentRepo = new AdminUserManagmentRepoImp()

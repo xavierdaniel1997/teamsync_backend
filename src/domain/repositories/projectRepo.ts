@@ -7,4 +7,5 @@ export interface IProjectRepo{
     findByWorkspace(workspaceId: string): Promise<IProject[]>
     findUserAccess(projectId: string, userId: string): Promise<IProject | null>
     incrementTaskCounter(projectId: string): Promise<IProject>;
+    update(projectId: string, updateData: any): Promise<IProject | null>
 }

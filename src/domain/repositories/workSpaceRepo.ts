@@ -9,4 +9,5 @@ export interface IWorkSpaceRepo{
     updateWorkspaceMembers(workspaceId: string, userId: string): Promise<IWorkspace>;
     findById(workspaceId: string): Promise<IWorkspace | null>
     findWorkspacesByMember(userId: string): Promise<IWorkspace[]>
+    findAllWorkspaces(): Promise<IWorkspace[]>;
 }

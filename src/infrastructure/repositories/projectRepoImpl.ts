@@ -11,7 +11,14 @@ export class ProjectRepoImpl implements IProjectRepo {
         return await ProjectModel.findById(projectId)
             .populate("workspace")
             .populate("owner")
-            .populate("members.user").select("-password");
+            .populate({
+                path: 'members.user',
+                select: '-password',
+              })
+              .populate({
+                path: "invitations",  
+                select: "email status accessLevel createdAt expiresAt token",
+            });
     }
 
     async addMember(projectId: string, userId: string, accessLevel: ProjectAccessLevel): Promise<IProject | null> {
@@ -50,4 +57,39 @@ export class ProjectRepoImpl implements IProjectRepo {
         }
         return project;
       }
+
+
+    //   async update(projectId: string, updateData: any): Promise<IProject | null> {
+    //     console.log("Updating project with data:", JSON.stringify(updateData, null, 2)); 
+    //     const updated = await ProjectModel.findByIdAndUpdate(
+    //         projectId,
+    //         { $set: updateData },
+    //         { new: true }
+    //     )
+    //         .populate("workspace")
+    //         .populate("owner")
+    //         .populate("members.user")
+    //         .select("-password");
+    //     console.log("Updated project:", updated);
+    //     return updateData
+    // }
+    
+    async update(projectId: string, updateData: any): Promise<IProject | null> {
+        const updated = await ProjectModel.findByIdAndUpdate(
+            projectId,
+            updateData, 
+            { new: true }
+        )
+            .populate("workspace")
+            .populate("owner")
+            .populate({
+                path: 'members.user',
+                select: '-password',
+              })
+              .populate({
+                path: "invitations",  
+                select: "email status accessLevel createdAt expiresAt token",
+            });
+        return updated;
+    }
 }

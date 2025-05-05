@@ -8,7 +8,7 @@ import { IWorkSpaceRepo } from "../../../domain/repositories/workSpaceRepo";
 
 export class CreateTaskUseCase {
     constructor(
-        private taskRepo: ITaskRepository,
+        private taskRepo: ITaskRepository, 
         private projectRepo: IProjectRepo,
         private userRepo: IUserRepository,
         private workspaceRepo: IWorkSpaceRepo,

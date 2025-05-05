@@ -24,10 +24,8 @@ const updateProfile = async (req: Request, res: Response): Promise<void> => {
             throw new Error("Unauthorized: User ID missing");
         }
         const existingUser = await userRepository.findUserById(userId);
-        // console.log("req body of update profile", req.body)
         const { email, fullName, secondName } = req.body
         const updateData: any = { userId, email, fullName, secondName };
-        // console.log("emai fullName lastName ", email, fullName, secondName)
         if (req.files && (req.files as any).avatar) {
             const avatarFile = (req.files as any).avatar[0];
             if (existingUser?.avatar) {

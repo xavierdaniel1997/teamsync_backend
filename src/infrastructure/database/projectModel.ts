@@ -4,7 +4,9 @@ import { IProject, ProjectAccessLevel } from "../../domain/entities/project";
 const projectSchema = new Schema<IProject>({
     projectkey: { type: String, required: true },
     name: { type: String, required: true },
+    title: { type: String },
     description: { type: String },
+    projectCoverImg: { type: String },
     workspace: { type: Schema.Types.ObjectId, ref: "WorkSpace", required: true },
     owner: { type: Schema.Types.ObjectId, ref: "User", required: true },
     members: [
@@ -17,6 +19,7 @@ const projectSchema = new Schema<IProject>({
             },
         },
     ],
+    invitations: [{ type: Schema.Types.ObjectId, ref: "Invitation", default: [] }],
     backlog: [{ type: Schema.Types.ObjectId, ref: "Task", default: [] }],
     sprints: [{ type: Schema.Types.ObjectId, ref: "Sprint", default: [] }],  
     taskCounter: {type: Number, default: 0},
