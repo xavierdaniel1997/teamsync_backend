@@ -15,7 +15,7 @@ export class GetSingleProjectUseCase{
         }
 
         const project = await this.projectRepo.findById(projectId);
-        console.log("after fetching the project", project)
+        // console.log("after fetching the project", project)
         if (!project) {
             throw new Error("Project not found");
         }
@@ -26,7 +26,7 @@ export class GetSingleProjectUseCase{
             throw new Error("You do not have permission to access this project");
         }
 
-        console.log("project detilas", project)
+        // console.log("project detilas", project)  
 
         return project
     

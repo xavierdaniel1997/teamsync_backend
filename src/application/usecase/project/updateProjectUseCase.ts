@@ -13,11 +13,11 @@ export class UpdateProjectUseCase {
         private subscriptionRepo: ISubscriptionRepo,
         private planRepo: IPlanRepository,
         private invitationRepo: IInvitationRepo
-    ) {}
+    ) { }
 
     async execute(projectData: ProjectDTO): Promise<IProject> {
-        const { projectId, userId, workspaceId, name, projectkey, title, description, projectCoverImg } = projectData;
-     
+        const { projectId, userId, workspaceId, name, projectkey, title, description, projectCoverImg, memberId, newAccessLevel } = projectData;
+
         if (!workspaceId || !projectId) {
             throw new Error("WorkspaceId or ProjectId is undefined");
         }
@@ -27,30 +27,43 @@ export class UpdateProjectUseCase {
         }
 
         const subscription = await this.subscriptionRepo.findByWorkspace(workspaceId);
-        // console.log("subscription form update project", subscription)
         if (!subscription || !subscription.plan) {
             throw new Error("No active subscription found");
         }
 
         const planId = subscription.plan as any;
-        // console.log("planId form the update project")
         const plan = await this.planRepo.findById(planId);
         if (!plan) {
             throw new Error("Plan not found");
         }
 
         const project = await this.projectRepo.findUserAccess(projectId, userId);
-        // console.log("project details form the project update", project)
         if (!project) {
             throw new Error("Project not found or user lacks permission");
         }
 
-        const userAccess = project.members.find(member => member.user.toString() === userId)?.accessLevel || 
-                          (project.owner.toString() === userId ? ProjectAccessLevel.OWNER : ProjectAccessLevel.NONE);
+        console.log("project detailsssssssssssss", project)
+
+        const userAccess = project.members.find(member => member.user.toString() === userId)?.accessLevel ||
+            (project.owner.toString() === userId ? ProjectAccessLevel.OWNER : ProjectAccessLevel.NONE);
         if (userAccess !== ProjectAccessLevel.OWNER && userAccess !== ProjectAccessLevel.WRITE) {
             throw new Error("User does not have WRITE or OWNER access to update the project");
         }
-        
+
+
+        if (memberId && newAccessLevel) {
+            const updatedProjectWithMember = await this.projectRepo.updateMemberAccessLevel(
+                projectId,
+                memberId,
+                newAccessLevel as ProjectAccessLevel
+            );
+            if (!updatedProjectWithMember) {
+                throw new Error("Failed to update member access level");
+            }
+            return updatedProjectWithMember;
+        }
+
+
         const updateData: Partial<IProject> = {};
         if (name) updateData.name = name;
         if (projectkey) updateData.projectkey = projectkey;
@@ -60,11 +73,10 @@ export class UpdateProjectUseCase {
 
 
         const updatedProject = await this.projectRepo.update(projectId, updateData);
-        // console.log("updated check", updatedProject)
         if (!updatedProject) {
             throw new Error("Failed to update project");
         }
-
+        console.log("updatedProject", updatedProject)
         return updatedProject;
     }
 }     

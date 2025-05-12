@@ -33,8 +33,10 @@ export class ITaskRepositoryImp implements ITaskRepository {
             sprint: { $exists: false },
             type: { $nin: [TaskType.EPIC, TaskType.SUBTASK] },
         })
+        .populate({ path: "epic", select: "title taskKey" })
         .populate("assignee").select("-password")
         .populate("reporter").select("-password")
+        .populate({path: "epic", select: "title taskKey", })
         .exec();
     }
 }

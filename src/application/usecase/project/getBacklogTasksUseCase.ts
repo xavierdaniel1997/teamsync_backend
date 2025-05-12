@@ -17,7 +17,7 @@ export class GetBacklogTasksUseCase {
         if (!project) {
             throw new Error("Unauthorized access to project");
         }
-        console.log("checking the access of project form the getbacklogTasksUsecase", project)
+        // console.log("checking the access of project form the getbacklogTasksUsecase", project)
 
         const tasks = await this.taskRepository.findBacklogTasks(projectId);
         return tasks;

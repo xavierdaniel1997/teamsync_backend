@@ -7,14 +7,18 @@ import { WorkSpaceRepositoryImp } from "../../../../infrastructure/repositories/
 import { CreateTaskUseCase } from "../../../../application/usecase/project/createTaskUseCase";
 import { GetEpicsByProjectUseCase } from "../../../../application/usecase/project/getEpicsByProjectUseCase";
 import { GetBacklogTasksUseCase } from "../../../../application/usecase/project/getBacklogTasksUseCase";
+import { SprintRepositoryImp } from "../../../../infrastructure/repositories/sprintRepoImp";
+import { GetTasksInSprintUseCase } from "../../../../application/usecase/project/getTasksInSprintUseCase";
 
 const taskRepo = new ITaskRepositoryImp()
 const projectRepo = new ProjectRepoImpl()
 const userRepo = new userRepositoryImp()
 const workSpaceRepo = new WorkSpaceRepositoryImp()
-const createTaskUseCase = new CreateTaskUseCase(taskRepo, projectRepo, userRepo, workSpaceRepo)
+const sprintRepo = new SprintRepositoryImp()
+const createTaskUseCase = new CreateTaskUseCase(taskRepo, projectRepo, userRepo, workSpaceRepo, sprintRepo)
 const getEpicsByProjectUseCase = new GetEpicsByProjectUseCase(taskRepo, projectRepo, workSpaceRepo, userRepo)
 const getBacklogTasksUseCase = new GetBacklogTasksUseCase(taskRepo, projectRepo)
+const getTasksInSprintUseCase = new GetTasksInSprintUseCase(sprintRepo, projectRepo)
 
 const createTask = async (req: Request, res: Response):Promise<void> => {
     try{
@@ -62,4 +66,16 @@ const getTasksController = async (req: Request, res: Response): Promise<void> =>
     }
 }
 
-export {createTask, getEpicByProject, updateTaskController, getTasksController}
+const getTaskFromSprint = async (req: Request, res: Response): Promise<void> => {
+    try{
+        const userId = (req as any).user?.userId;
+        const {workspaceId, projectId, sprintId} = req.params;
+        // console.log("workspaceId, projectId, sprintId", workspaceId, projectId, sprintId)
+        const sprintTasks = await getTasksInSprintUseCase.execute(userId, workspaceId, projectId, sprintId)
+        sendResponse(res, 200, sprintTasks, "successfull fetch the tasks form sprint")
+    }catch(error: any){
+        sendResponse(res, 400, null, error.message || "Failed to fetch the task form sprint")
+    }
+}
+
+export {createTask, getEpicByProject, updateTaskController, getTasksController, getTaskFromSprint}

@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { IProject, ProjectAccessLevel } from "../../domain/entities/project";
 import { IProjectRepo } from "../../domain/repositories/projectRepo";
 import ProjectModel from "../database/projectModel";
@@ -14,9 +15,9 @@ export class ProjectRepoImpl implements IProjectRepo {
             .populate({
                 path: 'members.user',
                 select: '-password',
-              })
-              .populate({
-                path: "invitations",  
+            })
+            .populate({
+                path: "invitations",
                 select: "email status accessLevel createdAt expiresAt token",
             });
     }
@@ -41,43 +42,27 @@ export class ProjectRepoImpl implements IProjectRepo {
     async findUserAccess(projectId: string, userId: string): Promise<IProject | null> {
         return await ProjectModel.findOne({
             _id: projectId,
-            $or: [{owner: userId}, { "members.user": userId }]
+            $or: [{ owner: userId }, { "members.user": userId }]
         })
     }
 
 
     async incrementTaskCounter(projectId: string): Promise<IProject> {
         const project = await ProjectModel.findByIdAndUpdate(
-          projectId,
-          { $inc: { taskCounter: 1 } },
-          { new: true }
+            projectId,
+            { $inc: { taskCounter: 1 } },
+            { new: true }
         ).exec();
         if (!project) {
-          throw new Error("Project not found");
+            throw new Error("Project not found");
         }
         return project;
-      }
+    }
 
-
-    //   async update(projectId: string, updateData: any): Promise<IProject | null> {
-    //     console.log("Updating project with data:", JSON.stringify(updateData, null, 2)); 
-    //     const updated = await ProjectModel.findByIdAndUpdate(
-    //         projectId,
-    //         { $set: updateData },
-    //         { new: true }
-    //     )
-    //         .populate("workspace")
-    //         .populate("owner")
-    //         .populate("members.user")
-    //         .select("-password");
-    //     console.log("Updated project:", updated);
-    //     return updateData
-    // }
-    
     async update(projectId: string, updateData: any): Promise<IProject | null> {
         const updated = await ProjectModel.findByIdAndUpdate(
             projectId,
-            updateData, 
+            updateData,
             { new: true }
         )
             .populate("workspace")
@@ -85,11 +70,31 @@ export class ProjectRepoImpl implements IProjectRepo {
             .populate({
                 path: 'members.user',
                 select: '-password',
-              })
-              .populate({
-                path: "invitations",  
+            })
+            .populate({
+                path: "invitations",
                 select: "email status accessLevel createdAt expiresAt token",
             });
         return updated;
     }
+
+    async updateMemberAccessLevel(projectId: string, memberId: string, newAccessLevel: ProjectAccessLevel): Promise<IProject | null> {
+        const updateAccessLevel = await ProjectModel.findOneAndUpdate(
+            { _id: projectId, "members.user": memberId },
+            { $set: { "members.$.accessLevel": newAccessLevel } },
+            { new: true }
+        )
+            .populate("workspace")
+            .populate("owner")
+            .populate({
+                path: "members.user",
+                select: "-password",
+            })
+            .populate({
+                path: "invitations",
+                select: "email status accessLevel createdAt expiresAt token",
+            });
+        return updateAccessLevel
+    }
+
 }

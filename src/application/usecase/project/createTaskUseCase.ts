@@ -2,25 +2,25 @@ import { CreateTaskDTO } from "../../../domain/dtos/createTaskDTO";
 import { ProjectAccessLevel } from "../../../domain/entities/project";
 import { ITask } from "../../../domain/entities/task";
 import { IProjectRepo } from "../../../domain/repositories/projectRepo";
+import { ISprintRepository } from "../../../domain/repositories/sprintRepo";
 import { ITaskRepository } from "../../../domain/repositories/taskRepository";
 import { IUserRepository } from "../../../domain/repositories/userRepo";
 import { IWorkSpaceRepo } from "../../../domain/repositories/workSpaceRepo";
 
 export class CreateTaskUseCase {
     constructor(
-        private taskRepo: ITaskRepository, 
+        private taskRepo: ITaskRepository,
         private projectRepo: IProjectRepo,
         private userRepo: IUserRepository,
         private workspaceRepo: IWorkSpaceRepo,
+        private sprintRepo: ISprintRepository,
     ) { }
 
     async execute(dto: CreateTaskDTO, userId: string): Promise<ITask> {
-        // console.log("this is also form the create task use case dto.project", dto.project)
-
         const workspace = await this.workspaceRepo.findById(dto.workspace);
         if (!workspace) {
             throw new Error("Workspace not found");
-        }   
+        }
 
         const project = await this.projectRepo.findUserAccess(dto.project, userId)
         if (!project) {
@@ -35,10 +35,10 @@ export class CreateTaskUseCase {
             throw new Error("User does not have permission to create tasks");
         }
 
-        // console.log("this is from the create task use case dto.project", dto.project)
+
         const projectTaskCount = await this.projectRepo.incrementTaskCounter(dto.project);
         const taskKey = `SCRUM-${projectTaskCount.taskCounter}`;
-        // console.log("this is also from the task create use case projectTaskCount result", projectTaskCount)
+
 
 
         const taskData: Partial<ITask> = {
@@ -62,7 +62,14 @@ export class CreateTaskUseCase {
         };
 
         const task = await this.taskRepo.create(taskData)
+
+        if(!task._id){
+            throw new Error("task id is not found");
+        }
+
+        if (dto.sprint) {
+            await this.sprintRepo.addTask(dto.sprint, task._id.toString());
+        }
         return task;
-        // console.log("created task", task)
     }
 }

@@ -10,7 +10,7 @@ const projectSchema = new Schema<IProject>({
     workspace: { type: Schema.Types.ObjectId, ref: "WorkSpace", required: true },
     owner: { type: Schema.Types.ObjectId, ref: "User", required: true },
     members: [
-        {
+        {   
             user: { type: Schema.Types.ObjectId, ref: "User" },
             accessLevel: {
                 type: String,

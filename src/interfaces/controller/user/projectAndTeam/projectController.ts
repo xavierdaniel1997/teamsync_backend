@@ -13,6 +13,7 @@ import { CreateSprintUseCase } from "../../../../application/usecase/project/cre
 import { SprintRepositoryImp } from "../../../../infrastructure/repositories/sprintRepoImp";
 import { UpdateProjectUseCase } from "../../../../application/usecase/project/updateProjectUseCase";
 import { deleteFromCloudinary, uploadToCloudinary } from "../../../utils/uploadAssets";
+import { InviteTeamMemberUseCase } from "../../../../application/usecase/project/inviteTeamMemberUseCase";
 
 
 const projectRepo = new ProjectRepoImpl()
@@ -27,8 +28,9 @@ const updateProjectUseCase = new UpdateProjectUseCase(projectRepo, workspaceRepo
 const getWorkspaceProjectsUseCase = new GetWorkspaceProjectsUseCase(projectRepo, workspaceRepo, userRepo)
 const getSingleProjectUseCase = new GetSingleProjectUseCase(projectRepo, userRepo)
 const createSprintUseCase = new CreateSprintUseCase(sprintRepo, projectRepo)
+const inviteTeamMemberUseCase = new InviteTeamMemberUseCase(projectRepo, workspaceRepo, subscriptionRepo, planRepo, invitationRepo)
 
-const createProject = async (req: Request, res: Response) => {
+const createProject = async (req: Request, res: Response) => {     
     try {
         const { name, projectkey, title, description, workspaceId, emails } = req.body;
         const userId = (req as any).user?.userId;
@@ -50,17 +52,18 @@ const createProject = async (req: Request, res: Response) => {
 }
 
 const updateProject = async (req: Request, res: Response): Promise<void> => {
-    // console.log("req.body form the updateproject", req.body)
+    console.log("req.body form the updateproject", req.body)
     try {
-        const { name, projectkey, description, title } = req.body;
+        const { name, projectkey, description, title, memberId,
+      newAccessLevel, } = req.body;
         const userId = (req as any).user?.userId;
-        const { projectId, workspaceId } = req.params;  
+        const { projectId, workspaceId } = req.params;
         let projectCoverImg: string | undefined;
         const existingProject = await projectRepo.findById(projectId)
         if (req.files && (req.files as any).projectCoverImg) {
             console.log("req.file checking", req.files)
-            const coverFile = (req.files as any).projectCoverImg[0];    
-            if (existingProject?.projectCoverImg) {  
+            const coverFile = (req.files as any).projectCoverImg[0];
+            if (existingProject?.projectCoverImg) {
                 await deleteFromCloudinary(existingProject.projectCoverImg);
             }
             const uploadedResult = await uploadToCloudinary(coverFile, {
@@ -72,9 +75,9 @@ const updateProject = async (req: Request, res: Response): Promise<void> => {
                 resource_type: 'image',
             })
             projectCoverImg = uploadedResult;
-            // console.log("image uploaded result form the update project", uploadedResult)
+           
         }
- 
+
         const project = await updateProjectUseCase.execute({
             projectId,
             userId,
@@ -82,8 +85,10 @@ const updateProject = async (req: Request, res: Response): Promise<void> => {
             name,
             projectkey,
             title,
-            description,   
-            projectCoverImg,  
+            description,
+            projectCoverImg,
+            memberId,
+      newAccessLevel,
         })
         // console.log("project details from the update project", project)   
         sendResponse(res, 200, project, "project edit successfully")
@@ -126,4 +131,17 @@ const getProjectDetails = async (req: Request, res: Response): Promise<void> => 
 }
 
 
-export { createProject, updateProject, getProjects, getProjectById, getProjectDetails }
+const inviteMemberToProject = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const {projectId, workspaceId} = req.params;
+        const {emails} = req.body;
+        const userId = (req as any).user?.userId;
+        const result = await inviteTeamMemberUseCase.execute(userId, projectId, workspaceId, emails)
+        sendResponse(res, 200, null, "successfully invited team member")
+    } catch (error: any) {
+        sendResponse(res, 400, null, error.message || "failed to invited team")
+    }
+}
+     
+
+export { createProject, updateProject, getProjects, getProjectById, getProjectDetails, inviteMemberToProject }   

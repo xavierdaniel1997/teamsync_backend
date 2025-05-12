@@ -4,7 +4,7 @@ import { ITask, TaskPriority, TaskStatus, TaskType } from "../../domain/entities
 const taskSchema = new Schema<ITask & Document>({
   project: { type: Schema.Types.ObjectId, ref: "Project", required: true },
   workspace: { type: Schema.Types.ObjectId, ref: "WorkSpace", required: true },
-  taskKey: { type: String, required: true, unique: true },
+  taskKey: { type: String, required: true,},
   title: { type: String, required: true },
   description: { type: String },
   type: {

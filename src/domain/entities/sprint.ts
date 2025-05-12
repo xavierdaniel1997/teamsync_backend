@@ -8,14 +8,14 @@ export enum SprintStatus {
   
   export interface ISprint {
     _id?: string;
+    sprintName?: string;
     project: Types.ObjectId | string;
     workspace: Types.ObjectId | string;
-    name: string;
     goal?: string;
     startDate?: Date;
     endDate?: Date;
     status: SprintStatus;
-    tasks: string[];
+    tasks: Types.ObjectId[];
     createdAt: Date;
     updatedAt: Date;
   }

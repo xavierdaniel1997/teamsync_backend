@@ -37,7 +37,7 @@ export class CreateSprintUseCase {
         const sprint: ISprint = {
             project: dto.projectId,
             workspace: dto.workspaceId,
-            name: sprintName,
+            sprintName: sprintName,
             goal: dto.goal,
             startDate: dto.startDate,
             endDate: dto.endDate,

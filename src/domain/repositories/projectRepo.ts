@@ -8,4 +8,5 @@ export interface IProjectRepo{
     findUserAccess(projectId: string, userId: string): Promise<IProject | null>
     incrementTaskCounter(projectId: string): Promise<IProject>;
     update(projectId: string, updateData: any): Promise<IProject | null>
+    updateMemberAccessLevel(projectId: string, memberId: string, newAccessLevel: ProjectAccessLevel): Promise<IProject | null>
 }

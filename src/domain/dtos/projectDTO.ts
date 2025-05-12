@@ -11,6 +11,8 @@ export interface ProjectDTO {
     userId: string;
     emails?: string[];
     accessLevel?: ProjectAccessLevel;
+    memberId?: string;
+    newAccessLevel?: string;
 }
 
 

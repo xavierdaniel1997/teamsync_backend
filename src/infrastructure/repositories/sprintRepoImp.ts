@@ -1,4 +1,5 @@
 import { ISprint } from "../../domain/entities/sprint";
+import { ITask } from "../../domain/entities/task";
 import { ISprintRepository } from "../../domain/repositories/sprintRepo";
 import SprintModel from "../database/sprintModel";
 
@@ -26,4 +27,44 @@ export class SprintRepositoryImp implements ISprintRepository {
     const sprints = await SprintModel.find({ project: projectId }).exec();
     return sprints.map((sprint) => sprint.toObject());
   }
+
+  async addTask(sprintId: string, taskId: string): Promise<ISprint | null> {
+    // console.log("data from the addtask spint imp", sprintId, taskId)
+     const sprint =  await SprintModel.findByIdAndUpdate(sprintId, {$addToSet: {tasks: taskId}},{ new: true })
+    //  console.log("after successfull adding task to sprint", sprint)
+     return sprint
+  }
+
+  // async findTasksInSprint(sprintId: string): Promise<ITask[]> {
+  //   const sprint = await SprintModel.findById(sprintId)
+  //     .populate("tasks")
+  //     .exec();
+    
+  //   if (!sprint) {
+  //     throw new Error("Sprint not found");
+  //   }
+  //   return sprint.tasks as unknown as ITask[];
+  // }
+
+
+   async findTasksInSprint(sprintId: string): Promise<ITask[]> {
+    const sprint = await SprintModel.findById(sprintId)
+      .populate({
+        path: "tasks",
+        populate: [
+          { path: "epic", select: "title taskKey" }, 
+          { path: "assignee", select: "name email -_id" }, 
+          { path: "reporter", select: "name email -_id" }, 
+        ],
+      })
+      .exec();
+
+    if (!sprint) {
+      throw new Error("Sprint not found");
+    }
+
+    // console.log("Sprint tasks with populated epic:", JSON.stringify(sprint.tasks, null, 2));
+    return sprint.tasks as unknown as ITask[];
+  }
+
 }

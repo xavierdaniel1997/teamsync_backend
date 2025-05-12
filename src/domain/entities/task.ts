@@ -33,7 +33,7 @@ export interface IFile {
 }
 
 export interface ITask {
-    id?: string;
+    _id?: string;
     project: Types.ObjectId | string;
     workspace: Types.ObjectId | string;
     taskKey: string;
