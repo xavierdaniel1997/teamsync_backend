@@ -2,7 +2,7 @@ import express from 'express';
 import { isAuth } from '../middleware/authMiddleware';
 import { createProject, getProjectById, getProjectDetails, getProjects, inviteMemberToProject, updateProject } from '../controller/user/projectAndTeam/projectController';
 import { acceptInvitation } from '../controller/user/teamAndInvitation/invitationController';
-import { createTask, getEpicByProject, getTaskFromSprint, getTasksController, updateTaskController } from '../controller/user/projectAndTeam/taskController';
+import { createTask, deleteTaskController, getEpicByProject, getTaskFromSprint, getTasksController, updateTaskController } from '../controller/user/projectAndTeam/taskController';
 import { createSprint, deleteSprint, getSprints } from '../controller/user/projectAndTeam/sprintController';
 import { upload } from '../middleware/upload';
 
@@ -17,10 +17,12 @@ router.put("/edit-project/:projectId/:workspaceId", isAuth , upload.fields([{nam
 router.post("/invite-member/:projectId/:workspaceId", isAuth, inviteMemberToProject)
 
 
+// task routes
 
 router.post("/create-task", isAuth, createTask)
 router.get("/project-epics/:projectId", isAuth, getEpicByProject)
-router.put("/update-task/:tasdId", isAuth, updateTaskController)
+router.put("/update-task/:workspaceId/:projectId/:taskId", isAuth, updateTaskController)
+router.delete("/delete-task/:workspaceId/:projectId/:taskId", isAuth, deleteTaskController)
 router.get("/backlog-tasks/:projectId", isAuth, getTasksController)
 router.get("/sprint-tasks/:workspaceId/:projectId/:sprintId", isAuth, getTaskFromSprint)
 
@@ -29,7 +31,7 @@ router.get("/sprint-tasks/:workspaceId/:projectId/:sprintId", isAuth, getTaskFro
 
 router.post("/create-sprint", isAuth, createSprint)    
 router.get("/sprints/:projectId", isAuth, getSprints)
-router.delete("/delete-sprint/:sprintId", isAuth, deleteSprint)   
+router.delete("/delete-sprint/:workspaceId/:projectId/:sprintId", isAuth, deleteSprint)   
 
 
 

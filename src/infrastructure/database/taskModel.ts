@@ -18,7 +18,7 @@ const taskSchema = new Schema<ITask & Document>({
     default: TaskStatus.TO_DO,
   },
   priority: {
-    type: String,
+    type: String, 
     enum: Object.values(TaskPriority),
     default: TaskPriority.MEDIUM,
   },

@@ -1,3 +1,4 @@
+import { UpdateQuery } from "mongoose";
 import { ISprint } from "../../domain/entities/sprint";
 import { ITask } from "../../domain/entities/task";
 import { ISprintRepository } from "../../domain/repositories/sprintRepo";
@@ -14,47 +15,46 @@ export class SprintRepositoryImp implements ISprintRepository {
   }
 
   async findById(id: string): Promise<ISprint | null> {
-    const sprint = await SprintModel.findById(id).exec();
+    const sprint = await SprintModel.findById(id).exec();             
     return sprint ? sprint.toObject() : null;
-  }
+  }    
 
-  async update(id: string, updates: Partial<ISprint>): Promise<ISprint | null> {
+
+
+  async update(id: string, updates: UpdateQuery<ISprint>): Promise<ISprint | null> {
     const sprint = await SprintModel.findByIdAndUpdate(id, updates, { new: true }).exec();
     return sprint ? sprint.toObject() : null;
   }
+
 
   async findByProject(projectId: string): Promise<ISprint[]> {
     const sprints = await SprintModel.find({ project: projectId }).exec();
     return sprints.map((sprint) => sprint.toObject());
   }
 
-  async addTask(sprintId: string, taskId: string): Promise<ISprint | null> {
-    // console.log("data from the addtask spint imp", sprintId, taskId)
-     const sprint =  await SprintModel.findByIdAndUpdate(sprintId, {$addToSet: {tasks: taskId}},{ new: true })
-    //  console.log("after successfull adding task to sprint", sprint)
-     return sprint
-  }
-
-  // async findTasksInSprint(sprintId: string): Promise<ITask[]> {
-  //   const sprint = await SprintModel.findById(sprintId)
-  //     .populate("tasks")
-  //     .exec();
-    
-  //   if (!sprint) {
-  //     throw new Error("Sprint not found");
-  //   }
-  //   return sprint.tasks as unknown as ITask[];
+  // async addTask(sprintId: string, taskId: string): Promise<ISprint | null> {
+  //    const sprint =  await SprintModel.findByIdAndUpdate(sprintId, {$addToSet: {tasks: taskId}},{ new: true })
+  //    return sprint
   // }
 
+  async addTask(sprintId: string, taskId: string): Promise<ISprint | null> {
+    const sprint = await SprintModel.findByIdAndUpdate(
+      sprintId,
+      { $addToSet: { tasks: taskId } },
+      { new: true }
+    ).exec();
+    return sprint ? sprint.toObject() : null;
+  }
 
-   async findTasksInSprint(sprintId: string): Promise<ITask[]> {
+
+  async findTasksInSprint(sprintId: string): Promise<ITask[]> {
     const sprint = await SprintModel.findById(sprintId)
       .populate({
         path: "tasks",
         populate: [
-          { path: "epic", select: "title taskKey" }, 
-          { path: "assignee", select: "name email -_id" }, 
-          { path: "reporter", select: "name email -_id" }, 
+          { path: "epic", select: "title taskKey" },
+          { path: "assignee", select: "-password" },
+          { path: "reporter", select: "-password" },
         ],
       })
       .exec();
@@ -62,9 +62,11 @@ export class SprintRepositoryImp implements ISprintRepository {
     if (!sprint) {
       throw new Error("Sprint not found");
     }
-
-    // console.log("Sprint tasks with populated epic:", JSON.stringify(sprint.tasks, null, 2));
     return sprint.tasks as unknown as ITask[];
+  }
+
+  async delete(id: string): Promise<void> {
+    await SprintModel.findByIdAndDelete(id).exec();
   }
 
 }

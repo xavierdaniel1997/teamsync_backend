@@ -9,6 +9,8 @@ import { GetEpicsByProjectUseCase } from "../../../../application/usecase/projec
 import { GetBacklogTasksUseCase } from "../../../../application/usecase/project/getBacklogTasksUseCase";
 import { SprintRepositoryImp } from "../../../../infrastructure/repositories/sprintRepoImp";
 import { GetTasksInSprintUseCase } from "../../../../application/usecase/project/getTasksInSprintUseCase";
+import { UpdateTaskUseCase } from "../../../../application/usecase/project/updateTaskUseCase";
+import { DeleteTaskUseCase } from "../../../../application/usecase/project/deleteTaskUseCase";
 
 const taskRepo = new ITaskRepositoryImp()
 const projectRepo = new ProjectRepoImpl()
@@ -19,6 +21,10 @@ const createTaskUseCase = new CreateTaskUseCase(taskRepo, projectRepo, userRepo,
 const getEpicsByProjectUseCase = new GetEpicsByProjectUseCase(taskRepo, projectRepo, workSpaceRepo, userRepo)
 const getBacklogTasksUseCase = new GetBacklogTasksUseCase(taskRepo, projectRepo)
 const getTasksInSprintUseCase = new GetTasksInSprintUseCase(sprintRepo, projectRepo)
+const updateTaskUseCase = new UpdateTaskUseCase(taskRepo, projectRepo, userRepo, workSpaceRepo, sprintRepo)
+const deleteTaskUseCase = new DeleteTaskUseCase(taskRepo, projectRepo, userRepo, workSpaceRepo, sprintRepo)
+
+
 
 const createTask = async (req: Request, res: Response):Promise<void> => {
     try{
@@ -45,12 +51,26 @@ const getEpicByProject = async (req: Request, res: Response):Promise<void> => {
 
 
 const updateTaskController = async (req: Request, res: Response): Promise<void> => {
-    console.log("req.body of the updateTaskController", req.body)
     try{
         const userId = (req as any).user?.userId;
-        sendResponse(res, 200, null, "successfull updated the task")
+        const {workspaceId, projectId, taskId} = req.params;  
+        const taskData = { ...req.body, workspace: workspaceId, project: projectId, taskId };
+        const task = await updateTaskUseCase.execute(taskData, userId)
+        sendResponse(res, 200, task, "successfull updated the task")
     }catch(error: any){
         sendResponse(res, 400, null, error.message || "Failed to edit the task")
+    }
+}
+
+
+const deleteTaskController = async (req: Request, res: Response): Promise<void> => {
+    try{
+        const userId = (req as any).user?.userId;
+        const {workspaceId, projectId, taskId} = req.params;  
+        await deleteTaskUseCase.execute(workspaceId, projectId, taskId, userId)
+        sendResponse(res, 200, null, "successfull delete the task")
+    }catch(error: any){
+        sendResponse(res, 400, null, error.message || "Failed to delete the task")
     }
 }
      
@@ -78,4 +98,4 @@ const getTaskFromSprint = async (req: Request, res: Response): Promise<void> => 
     }
 }
 
-export {createTask, getEpicByProject, updateTaskController, getTasksController, getTaskFromSprint}
+export {createTask, getEpicByProject, updateTaskController, deleteTaskController, getTasksController, getTaskFromSprint}

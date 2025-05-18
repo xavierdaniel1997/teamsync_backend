@@ -46,7 +46,7 @@ export interface ITask {
     reporter?: Types.ObjectId | string;
     epic?: Types.ObjectId | string;
     parent?: Types.ObjectId | string;
-    sprint?: Types.ObjectId | string;
+    sprint?: Types.ObjectId | string | null ;
     storyPoints?: number;
     files?: IFile[];
     createdAt: Date;
