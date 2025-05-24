@@ -1,5 +1,7 @@
+import { SprintStatus } from "../../domain/entities/sprint";
 import { ITask, TaskType } from "../../domain/entities/task";
 import { ITaskRepository } from "../../domain/repositories/taskRepository";
+import SprintModel from "../database/sprintModel";
 import TaskModel from "../database/taskModel";
 
 
@@ -63,6 +65,46 @@ export class ITaskRepositoryImp implements ITaskRepository {
   }
 
   async updateMany(filter: any, update: Partial<ITask>): Promise<void> {
-        await TaskModel.updateMany(filter, update).exec();
-    }
+    await TaskModel.updateMany(filter, update).exec();
+  }
+
+
+
+  async findTasksBySprintStatus(projectId: string, status: SprintStatus): Promise<ITask[]> {
+    const sprints = await SprintModel.find({ project: projectId, status }, '_id').lean().exec();
+    const sprintIds = sprints.map((sprint) => sprint._id);
+    const tasks = await TaskModel.find({
+      project: projectId,
+      sprint: { $in: sprintIds },
+      type: { $nin: [TaskType.EPIC, TaskType.SUBTASK] },
+    })
+      .select('taskKey title description type status priority assignee reporter epic sprint storyPoints files createdAt updatedAt project workspace')
+      .populate({ path: 'epic', select: 'title taskKey' })
+      .populate({ path: 'assignee', select: '-password' })
+      .populate({ path: 'reporter', select: '-password' })
+      .lean()
+      .exec();
+    return tasks as ITask[];
+  }
+
+
+  //  async findTaskByProjects(projectId: string): Promise<ITask[]> {
+  //      return await TaskModel.find({project: projectId})
+  //  }
+
+  async findTaskByProjects(projectId: string): Promise<ITask[]> {
+    const tasks = await TaskModel.find({
+      project: projectId,
+      type: { $ne: TaskType.EPIC }, 
+    })
+      .select('taskKey title description type status priority assignee reporter epic sprint storyPoints files createdAt updatedAt project workspace')
+      .populate({ path: 'epic', select: 'title taskKey' })
+      .populate({ path: 'assignee', select: '-password' })
+      .populate({ path: 'reporter', select: '-password' })
+      .lean()
+      .exec();
+    return tasks as ITask[];
+  }
+
+
 }

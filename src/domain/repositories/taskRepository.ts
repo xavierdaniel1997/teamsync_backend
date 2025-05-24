@@ -1,3 +1,4 @@
+import { SprintStatus } from "../entities/sprint";
 import { ITask } from "../entities/task";
 
 export interface ITaskRepository{
@@ -9,4 +10,6 @@ export interface ITaskRepository{
     update(id: string, taskData: Partial<ITask>): Promise<ITask | null>;
     delete(taskId: string): Promise<void>;
     updateMany(filter: any, update: Partial<ITask>): Promise<void>
+    findTasksBySprintStatus(projectId: string, status: SprintStatus): Promise<ITask[]>;
+    findTaskByProjects(projectId: string): Promise<ITask[]>
 }

@@ -4,7 +4,8 @@ import { ISprint, SprintStatus } from "../../domain/entities/sprint";
 const sprintSchema = new Schema<ISprint & Document>({
   project: { type: Schema.Types.ObjectId, ref: "Project", required: true },
   workspace: { type: Schema.Types.ObjectId, ref: "WorkSpace", required: true },
-  sprintName: { type: String, required: true }, 
+  sprintName: { type: String, required: true },
+  duration: {type: String}, 
   startDate: { type: Date },
   endDate: { type: Date },
   status: {
@@ -14,6 +15,7 @@ const sprintSchema = new Schema<ISprint & Document>({
     default: SprintStatus.PLANNED,
   },
   tasks: [{ type: Schema.Types.ObjectId, ref: "Task", default: [] }],
+  description: {type: String},
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

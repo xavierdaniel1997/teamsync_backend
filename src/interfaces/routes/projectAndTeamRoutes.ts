@@ -2,7 +2,7 @@ import express from 'express';
 import { isAuth } from '../middleware/authMiddleware';
 import { createProject, getProjectById, getProjectDetails, getProjects, inviteMemberToProject, updateProject } from '../controller/user/projectAndTeam/projectController';
 import { acceptInvitation } from '../controller/user/teamAndInvitation/invitationController';
-import { createTask, deleteTaskController, getEpicByProject, getTaskFromSprint, getTasksController, updateTaskController } from '../controller/user/projectAndTeam/taskController';
+import { createTask, deleteTaskController, getAllTasksByProject, getEpicByProject, getTaskBySprintStatus, getTaskFromSprint, getTasksController, updateTaskController } from '../controller/user/projectAndTeam/taskController';
 import { createSprint, deleteSprint, getSprints } from '../controller/user/projectAndTeam/sprintController';
 import { upload } from '../middleware/upload';
 
@@ -25,6 +25,8 @@ router.put("/update-task/:workspaceId/:projectId/:taskId", isAuth, updateTaskCon
 router.delete("/delete-task/:workspaceId/:projectId/:taskId", isAuth, deleteTaskController)
 router.get("/backlog-tasks/:projectId", isAuth, getTasksController)
 router.get("/sprint-tasks/:workspaceId/:projectId/:sprintId", isAuth, getTaskFromSprint)
+router.get("/all-tasks/:workspaceId/:projectId", isAuth, getAllTasksByProject)
+router.get("/taskby-sprintstatus/:workspaceId/:projectId", isAuth, getTaskBySprintStatus)
 
 
 //sprint routes
