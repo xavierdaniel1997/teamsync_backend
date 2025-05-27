@@ -3,7 +3,7 @@ import { isAuth } from '../middleware/authMiddleware';
 import { createProject, getProjectById, getProjectDetails, getProjects, inviteMemberToProject, updateProject } from '../controller/user/projectAndTeam/projectController';
 import { acceptInvitation } from '../controller/user/teamAndInvitation/invitationController';
 import { createTask, deleteTaskController, getAllTasksByProject, getEpicByProject, getTaskBySprintStatus, getTaskFromSprint, getTasksController, updateTaskController } from '../controller/user/projectAndTeam/taskController';
-import { createSprint, deleteSprint, getSprints } from '../controller/user/projectAndTeam/sprintController';
+import { createSprint, deleteSprint, getSprints, startSprint } from '../controller/user/projectAndTeam/sprintController';
 import { upload } from '../middleware/upload';
 
 const router = express.Router()
@@ -34,6 +34,7 @@ router.get("/taskby-sprintstatus/:workspaceId/:projectId", isAuth, getTaskBySpri
 router.post("/create-sprint", isAuth, createSprint)    
 router.get("/sprints/:projectId", isAuth, getSprints)
 router.delete("/delete-sprint/:workspaceId/:projectId/:sprintId", isAuth, deleteSprint)   
+router.post("/start-sprint/:workspaceId/:projectId/:sprintId", isAuth, startSprint)
 
 
 

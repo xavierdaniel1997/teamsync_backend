@@ -14,9 +14,6 @@ export class DeleteSprintUseCase {
 
     async execute(workspaceId: string, projectId: string, sprintId: string, userId: string): Promise<void> {
 
-        console.log("form the usecase delete sprint workspaceId: ", workspaceId, "projectId: ", projectId, "sprintId: ", sprintId)
-
-
         const workspace = await this.workspaceRepo.findById(workspaceId);
         if (!workspace) {
             throw new Error("Workspace not found");

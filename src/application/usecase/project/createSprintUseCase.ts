@@ -13,15 +13,14 @@ export class CreateSprintUseCase {
     async execute(dto: CreateSprintDTO): Promise<void> {
 
         const project = await this.projctRepo.findById(dto.projectId);
-        if (!project) {
+        if (!project) {  
             throw new Error("Project not found");
-        }
-
+        }    
+      
         if (project.workspace._id.toString() !== dto.workspaceId) {
             throw new Error("Workspace does not match project");
         }
 
-        console.log("project details form the sprint create use case", project)
         const isOwner = project.owner._id.toString() === dto.userId;
         const member = project.members.find((member) => member.user.toString() === dto.userId)
 
@@ -38,7 +37,7 @@ export class CreateSprintUseCase {
             project: dto.projectId,
             workspace: dto.workspaceId,
             sprintName: sprintName,
-            goal: dto.goal,
+            goal: dto.goal,  
             startDate: dto.startDate,
             endDate: dto.endDate,
             status: SprintStatus.PLANNED,

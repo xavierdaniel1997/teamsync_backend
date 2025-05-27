@@ -11,13 +11,13 @@ export enum SprintStatus {
     sprintName?: string;
     project: Types.ObjectId | string;
     workspace: Types.ObjectId | string;
-    goal?: string;
     duration?: string;
     startDate?: Date;
-    endDate?: Date;
+    endDate?: Date;   
+    goal?: string;
     status: SprintStatus;
     tasks: Types.ObjectId[];
     description?: string;
     createdAt: Date;
     updatedAt: Date;
-  }
+  }        

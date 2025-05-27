@@ -32,10 +32,6 @@ export class SprintRepositoryImp implements ISprintRepository {
     return sprints.map((sprint) => sprint.toObject());
   }
 
-  // async addTask(sprintId: string, taskId: string): Promise<ISprint | null> {
-  //    const sprint =  await SprintModel.findByIdAndUpdate(sprintId, {$addToSet: {tasks: taskId}},{ new: true })
-  //    return sprint
-  // }
 
   async addTask(sprintId: string, taskId: string): Promise<ISprint | null> {
     const sprint = await SprintModel.findByIdAndUpdate(

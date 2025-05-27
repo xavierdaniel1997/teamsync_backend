@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { IProject, ProjectAccessLevel } from "../../domain/entities/project";
 import { IProjectRepo } from "../../domain/repositories/projectRepo";
 import ProjectModel from "../database/projectModel";
+import { IUser } from "../../domain/entities/user";
 
 export class ProjectRepoImpl implements IProjectRepo {
     async create(project: Partial<IProject>): Promise<IProject> {
@@ -96,5 +97,26 @@ export class ProjectRepoImpl implements IProjectRepo {
             });
         return updateAccessLevel
     }
+
+
+
+    async findMembersByProject(projectId: string): Promise<IProject> {
+    const project = await ProjectModel.findById(projectId)
+      .select("members owner")
+      .populate({
+        path: "members.user",
+        select: "fullName secondName email avatar role secondName isVerified createdAt isRegComplet",
+      })
+    //   .populate({
+    //     path: "owner",
+    //     select: "fullName secondName email avatar role secondName isVerified createdAt isRegComplet",
+    //   })
+      .exec();
+    if (!project) {
+      throw new Error("Project not found");
+    }
+
+    return project
+  }
 
 }

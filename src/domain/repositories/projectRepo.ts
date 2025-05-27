@@ -1,4 +1,5 @@
 import { IProject, ProjectAccessLevel } from "../entities/project";
+import { IUser } from "../entities/user";
 
 export interface IProjectRepo{
     create(project: Partial<IProject>): Promise<IProject>;
@@ -9,4 +10,5 @@ export interface IProjectRepo{
     incrementTaskCounter(projectId: string): Promise<IProject>;
     update(projectId: string, updateData: any): Promise<IProject | null>
     updateMemberAccessLevel(projectId: string, memberId: string, newAccessLevel: ProjectAccessLevel): Promise<IProject | null>
+    findMembersByProject(projectId: string): Promise<IProject>;
 }

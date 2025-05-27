@@ -7,6 +7,7 @@ import { GetSprintUseCase } from "../../../../application/usecase/project/getSpr
 import { ITaskRepositoryImp } from "../../../../infrastructure/repositories/taskRepositoryImp";
 import { WorkSpaceRepositoryImp } from "../../../../infrastructure/repositories/workSpaceRepositoryImp";
 import { DeleteSprintUseCase } from "../../../../application/usecase/project/deleteSprintUseCase";
+import { StartSprintUseCase } from "../../../../application/usecase/project/startSprintUseCase";
 
 
 const sprintRepo = new SprintRepositoryImp()
@@ -16,6 +17,7 @@ const workspaceRepo = new WorkSpaceRepositoryImp()
 const createSprintUseCase = new CreateSprintUseCase(sprintRepo, projectRepo)
 const getSprintUseCase = new GetSprintUseCase(sprintRepo, projectRepo)
 const deleteSprintUseCase = new DeleteSprintUseCase(sprintRepo, projectRepo, taskRepo, workspaceRepo)
+const startSprintUseCase = new StartSprintUseCase(sprintRepo, projectRepo, taskRepo, workspaceRepo)
 
 
 const createSprint = async (req: Request, res: Response) => {
@@ -53,12 +55,29 @@ const deleteSprint = async (req: Request, res: Response) => {
     try{
         const userId = (req as any).user?.userId;
         const {workspaceId, projectId, sprintId} = req.params;
-        console.log("workspaceId projectId sprintIdddddddddddddddddddddd", sprintId)
         await deleteSprintUseCase.execute(workspaceId, projectId, sprintId, userId)
         sendResponse(res, 200, null, "Sprint deleted successfully")
     }catch(error: any){
         sendResponse(res, 400, null, error.message || "Failed to delete the sprint")
     }
 }
+  
+const startSprint = async (req: Request, res: Response) => {
+    try{
+        console.log("req.body fom the start sprint", req.body) 
+        const userId = (req as any).user?.userId;
+        const {workspaceId, projectId, sprintId} = req.params;
+        // console.log("workspaceid, projectid, sprintid", workspaceId, projectId, sprintId)
+        const sprintData = {...req.body, workspaceId, projectId, sprintId}
+        const sprint = await startSprintUseCase.execute(sprintData, userId)
+        sendResponse(res, 200, sprint, 'successfull start sprint')
+    }catch(error: any){  
+        sendResponse(res, 400, null, error.message || "Failed to start sprint")
+    }
+}   
+        
+  
 
-export {createSprint, getSprints, deleteSprint}
+
+
+export {createSprint, getSprints, deleteSprint, startSprint}  

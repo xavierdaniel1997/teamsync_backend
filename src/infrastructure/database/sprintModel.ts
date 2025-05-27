@@ -8,6 +8,7 @@ const sprintSchema = new Schema<ISprint & Document>({
   duration: {type: String}, 
   startDate: { type: Date },
   endDate: { type: Date },
+  goal: { type: String },
   status: {
     type: String,
     enum: Object.values(SprintStatus),
