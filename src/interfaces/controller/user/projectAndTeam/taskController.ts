@@ -13,6 +13,7 @@ import { UpdateTaskUseCase } from "../../../../application/usecase/project/updat
 import { DeleteTaskUseCase } from "../../../../application/usecase/project/deleteTaskUseCase";
 import { GetTasksBySprintStatusUseCase } from "../../../../application/usecase/project/getTasksBySprintStatusUseCase";
 import { GetAllTasksByProjectUseCase } from "../../../../application/usecase/project/getAllTasksByProjectUseCase";
+import { GetSprintTasksByStatusUseCase } from "../../../../application/usecase/project/getSprintTasksByStatusUseCase";
 
 const taskRepo = new ITaskRepositoryImp()
 const projectRepo = new ProjectRepoImpl()
@@ -27,6 +28,7 @@ const updateTaskUseCase = new UpdateTaskUseCase(taskRepo, projectRepo, userRepo,
 const deleteTaskUseCase = new DeleteTaskUseCase(taskRepo, projectRepo, userRepo, workSpaceRepo, sprintRepo)
 const getTasksBySprintStatusUseCase = new GetTasksBySprintStatusUseCase(taskRepo, projectRepo, workSpaceRepo)
 const getTasksByProjectUseCaseUseCase = new GetAllTasksByProjectUseCase(taskRepo, projectRepo, workSpaceRepo)
+const getSprintTasksByStatusUseCase = new GetSprintTasksByStatusUseCase(sprintRepo, projectRepo, workSpaceRepo, taskRepo)
 
 
 
@@ -130,4 +132,15 @@ const getTaskBySprintStatus = async (req: Request, res: Response): Promise<void>
     }
 }
 
-export { createTask, getEpicByProject, updateTaskController, deleteTaskController, getTasksController, getTaskFromSprint, getAllTasksByProject, getTaskBySprintStatus }
+const getTaskInBoard = async (req: Request, res: Response): Promise<void> => {
+    try{
+         const userId = (req as any).user?.userId;
+        const { workspaceId, projectId} = req.params;
+        const tasks = await getSprintTasksByStatusUseCase.execute(workspaceId, projectId, userId)
+        sendResponse(res, 200, null, "successfull fetch the tasks for kanban board")
+    }catch(error: any){
+        sendResponse(res, 400, null, error.message || "Failed to fetch the task")
+    }
+}
+
+export { createTask, getEpicByProject, updateTaskController, deleteTaskController, getTasksController, getTaskFromSprint, getAllTasksByProject, getTaskBySprintStatus,  getTaskInBoard}
