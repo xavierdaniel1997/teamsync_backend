@@ -13,8 +13,8 @@ export enum TaskStatus {
     IN_PROGRESS = "IN_PROGRESS",
     IN_REVIEW = "IN_REVIEW",    
     DONE = "DONE",
-    BLOCKED = "BLOCKED",           
-    TESTING = "TESTING",  
+    // BLOCKED = "BLOCKED",           
+    // TESTING = "TESTING",  
 }
 
 export enum TaskPriority {
@@ -51,4 +51,16 @@ export interface ITask {
     files?: IFile[];
     createdAt: Date;
     updatedAt: Date;
+}
+
+export interface KanbanStatusGroup {
+  status: TaskStatus;
+  tasks: ITask[];
+}
+
+export interface KanbanResponse {
+  success: boolean;
+  status: number;
+  message: string;
+  data: KanbanStatusGroup[];
 }

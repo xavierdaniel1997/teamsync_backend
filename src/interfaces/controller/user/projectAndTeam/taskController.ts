@@ -137,7 +137,7 @@ const getTaskInBoard = async (req: Request, res: Response): Promise<void> => {
          const userId = (req as any).user?.userId;
         const { workspaceId, projectId} = req.params;
         const tasks = await getSprintTasksByStatusUseCase.execute(workspaceId, projectId, userId)
-        sendResponse(res, 200, null, "successfull fetch the tasks for kanban board")
+        sendResponse(res, 200, tasks, "successfull fetch the tasks for kanban board")
     }catch(error: any){
         sendResponse(res, 400, null, error.message || "Failed to fetch the task")
     }
