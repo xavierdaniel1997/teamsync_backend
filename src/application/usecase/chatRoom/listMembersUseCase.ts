@@ -23,7 +23,7 @@ export class ListMembersUseCase {
         const member = project.members.find((member) => member.user.toString() === userId)
 
         const projectMembers = await this.projectRepo.findMembersByProject(projectId)
-        console.log("projectMembers details form the listmembers use case", projectMembers)
+        // console.log("projectMembers details form the listmembers use case", projectMembers)
 
         return projectMembers;
 

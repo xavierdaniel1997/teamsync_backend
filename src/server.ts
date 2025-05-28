@@ -7,8 +7,13 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { handleWebhook } from './interfaces/controller/user/subscriptions/webhookController';
 import { configureCloudinary } from './config/cloudinary';
+import { initializeSocket } from './config/socket';
+import {createServer} from 'http';
+import { setupChatSocket } from './interfaces/socket/chatSocket';
 
 const app: Application = express()
+const server = createServer(app)
+const io = initializeSocket(server)
 
 const PORT: Number = 5000;
 
@@ -29,10 +34,12 @@ app.get("/", (req:Request, res:Response) => {
     res.json({message: "teamsync server test message"})
 })
 
-app.use("/api", apiRoute)
+app.use("/api", apiRoute) 
 
 app.use(errorMiddleware)
 
-app.listen(PORT, () => {
+setupChatSocket(io)
+
+server.listen(PORT, () => {
     console.log(`server starts at PORT ${PORT}`)
 })
