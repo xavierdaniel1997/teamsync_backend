@@ -36,6 +36,12 @@ export class CreateTaskUseCase {
         }
 
 
+        const findExistingTitle = await this.taskRepo.findSameTask(dto.project, dto.title)
+        console.log("check data form the findExistingTitle", findExistingTitle)
+        if(findExistingTitle){
+            throw new Error("the task title is already existing")
+        }
+
         const projectTaskCount = await this.projectRepo.incrementTaskCounter(dto.project);
         const taskKey = `SCRUM-${projectTaskCount.taskCounter}`;
 

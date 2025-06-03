@@ -107,4 +107,14 @@ export class ITaskRepositoryImp implements ITaskRepository {
   }
 
 
+  async findSameTask(projectId: string, title: string): Promise<ITask | null> {
+    const task = await TaskModel.findOne({project: projectId, title})
+    return task;
+  }
+
+  async findSameTaskExcludingId(projecId: string, title: string, excludeTaskId: string): Promise<ITask | null> {
+    const task = await TaskModel.findOne({project: projecId, title, _id: {$ne: excludeTaskId}})
+    return task;
+  }
+
 }

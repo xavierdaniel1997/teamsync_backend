@@ -35,10 +35,17 @@ export class UpdateTaskUseCase {
             throw new Error("User does not have permission to create tasks");
         }
 
-        const existingTask = await this.taskRepo.findById(dto.taskId);
+        const existingTask = await this.taskRepo.findById(dto.taskId);  
         if (!existingTask) {
             throw new Error("Task not found");
         }
+
+        const existingDuplicate = await this.taskRepo.findSameTaskExcludingId(dto.project, dto.title || "", dto.taskId)
+        if(existingDuplicate){
+             throw new Error("Another task with the same title already exists in this project");
+        }
+
+
 
         const taskData: Partial<ITask> = {
             title: dto.title,
@@ -55,10 +62,6 @@ export class UpdateTaskUseCase {
             updatedAt: new Date(),
         };
 
-
-        // (Object.keys(taskData) as (keyof ITask)[]).forEach(
-        //     (key) => taskData[key] === undefined && delete taskData[key]
-        // );
                                                              
 
          (Object.keys(taskData) as (keyof ITask)[]).forEach(
@@ -66,14 +69,13 @@ export class UpdateTaskUseCase {
         );
 
         if (dto.sprint !== undefined && dto.sprint !== existingTask.sprint) {
-            // Case 1: Moving from sprint to backlog (sprint -> null)
             if (existingTask.sprint && !dto.sprint) {
                  console.log(`Removing task ${dto.taskId} from sprint ${existingTask.sprint}`);
                 await this.sprintRepo.update(existingTask.sprint.toString(), {
                     $pull: { tasks: dto.taskId },
                 });
             }
-            // Case 2: Moving from backlog to sprint (null -> sprint)
+
             else if (!existingTask.sprint && dto.sprint) {
                 const sprint = await this.sprintRepo.findById(dto.sprint);
                 if (!sprint) {
@@ -81,7 +83,7 @@ export class UpdateTaskUseCase {
                 }
                 await this.sprintRepo.addTask(dto.sprint, dto.taskId);
             }
-            // Case 3: Moving from sprint to sprint
+
             else if (existingTask.sprint && dto.sprint && existingTask.sprint.toString() !== dto.sprint) {
                 await this.sprintRepo.update(existingTask.sprint.toString(), {
                     $pull: { tasks: dto.taskId },

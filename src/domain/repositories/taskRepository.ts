@@ -12,4 +12,6 @@ export interface ITaskRepository{
     updateMany(filter: any, update: Partial<ITask>): Promise<void>
     findTasksBySprintStatus(projectId: string, status: SprintStatus): Promise<ITask[]>;
     findTaskByProjects(projectId: string): Promise<ITask[]>
+    findSameTask(projecId: string, title: string): Promise<ITask | null>
+    findSameTaskExcludingId(projecId: string, title: string, excludeTaskId: string): Promise<ITask | null>
 }

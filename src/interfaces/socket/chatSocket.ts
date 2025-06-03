@@ -1,8 +1,10 @@
 import { Socket, Server as SocketIOServer } from "socket.io";
-import { SendMessageUseCase } from "../../application/usecase/chatRoom/sendMessageUseCase";
-import { GetMessagesUseCase } from "../../application/usecase/chatRoom/getMessagesUseCase";
 import { ChatRepoImpl } from "../../infrastructure/repositories/chatRepoImpl";
 import { ProjectRepoImpl } from "../../infrastructure/repositories/projectRepoImpl";
+import { handleRegister } from "./handlers/register";
+import { handleCheckOnline } from "./handlers/checkOnline";
+import { handleDisconnect } from "./handlers/disconnect";
+import { handleSendMessage } from "./handlers/sendMessage";
 
 interface AuthenticatedUser {
     userId: string;
@@ -16,13 +18,11 @@ interface AuthenticatedSocket extends Socket {
 
 const chatRepo = new ChatRepoImpl();
 const projectRepo = new ProjectRepoImpl();
-const sendMessageUseCase = new SendMessageUseCase(chatRepo, projectRepo);
-const getMessagesUseCase = new GetMessagesUseCase(chatRepo, projectRepo);
 
 
 export const setupChatSocket = (io: SocketIOServer) => {
     io.on("connection", (socket: AuthenticatedSocket) => {
-        console.log("User connected to chatroom :", socket.id);
+        // console.log("User connected to chatroom :", socket.id);
 
         const userId = socket.user?.userId;
         if (userId) {
@@ -35,48 +35,49 @@ export const setupChatSocket = (io: SocketIOServer) => {
             socket.disconnect();
         });
 
+        //socket coustom events
 
-
-        socket.on('joinConversation', async ({ projectId, recipientId }: { projectId: string; recipientId: string }) => {
-            try {
-                if (!userId) {
-                    throw new Error("User not authenticated");
-                }
-                const project = await projectRepo.findUserAccess(projectId, userId);
-                if (!project) {
-                    throw new Error("Project not found or user does not have access");
-                }
-                const roomId = [userId, recipientId].sort().join("_");
-                socket.join(roomId);
-                const messages = await getMessagesUseCase.execute(projectId, recipientId, userId);
-                socket.emit("loadMessages", messages);
-            } catch (error: any) {
-                socket.emit("error", { message: error.message });
+        socket.on("register", (userId: string) => {
+            if (socket.user?.userId === userId) {
+                handleRegister(io, socket, userId);
+            } else {
+                socket.emit("error", { message: "Unauthorized registration attempt" });
             }
+        });
+
+        socket.on('onlineStatus', (targetId: string) => {
+            console.log("called onlinstatus", targetId)
+            handleCheckOnline(socket, targetId)
         })
 
 
-
-        socket.on("sendMessage", async ({ projectId, recipientId, message, tempId }: { projectId: string; recipientId: string; message: string, tempId?: string }) => {
-            try {
-                if (!userId) {
-                    throw new Error('User not authenticated');
-                }
-                console.log("send message details", projectId, "userId : ", userId, "message : ", message)
-                const chatMessage = await sendMessageUseCase.execute(projectId, recipientId, userId, message);
-                const roomId = [userId, recipientId].sort().join("_");
-                // io.to(roomId).emit("newMessage", chatMessage);
-                // io.to(userId).to(recipientId).emit("newMessage", chatMessage);
-                const messageWithTempId = { ...chatMessage, tempId };
-                io.to(roomId).emit("newMessage", messageWithTempId);
-            } catch (error: any) {
-                socket.emit("error", { message: error.message });
+        socket.on('sendMessage', async ({ projectId, recipientId, message }: { projectId: string, recipientId: string, message: string }) => {
+            if (!socket.user?.userId) {
+                socket.emit("error", { message: "User not authenticated" });
+                return;
             }
-        })
 
+            const senderId = socket.user.userId;
+
+            if (!projectId || !recipientId || !message) {
+                socket.emit("error", { message: "Missing required fields" });
+                return;
+            }
+
+            try {
+                await handleSendMessage(io, socket, projectId, senderId, recipientId, message)
+            } catch (error) {
+                console.error("Error in sendMessage event:", error);
+                socket.emit("error", { message: "Failed to send message" });
+            }
+
+        })
 
 
         socket.on("disconnect", () => {
+            if (userId) {
+                handleDisconnect(io, socket, userId);
+            }
             console.log("User disconnected: ", socket.id)
         })
 

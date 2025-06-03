@@ -42,7 +42,6 @@ export class UpdateProjectUseCase {
             throw new Error("Project not found or user lacks permission");
         }
 
-        console.log("project detailsssssssssssss", project)
 
         const userAccess = project.members.find(member => member.user.toString() === userId)?.accessLevel ||
             (project.owner.toString() === userId ? ProjectAccessLevel.OWNER : ProjectAccessLevel.NONE);
