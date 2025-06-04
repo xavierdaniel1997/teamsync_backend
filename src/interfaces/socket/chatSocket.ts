@@ -5,6 +5,7 @@ import { handleRegister } from "./handlers/register";
 import { handleCheckOnline } from "./handlers/checkOnline";
 import { handleDisconnect } from "./handlers/disconnect";
 import { handleSendMessage } from "./handlers/sendMessage";
+import { handleStartTyping } from "./handlers/startTyping";
 
 interface AuthenticatedUser {
     userId: string;
@@ -70,6 +71,14 @@ export const setupChatSocket = (io: SocketIOServer) => {
                 console.error("Error in sendMessage event:", error);
                 socket.emit("error", { message: "Failed to send message" });
             }
+
+        })
+
+        socket.on('typing', ({senderId, recipientId}: {senderId: string, recipientId: string}) => {
+            handleStartTyping(io, senderId, recipientId)
+        })
+
+        socket.on('stopTyping', ({senderId, recipientId} : {senderId: string, recipientId: string}) => {
 
         })
 

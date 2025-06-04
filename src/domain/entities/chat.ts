@@ -7,5 +7,12 @@ export interface IChat {
   recipientId: mongoose.Types.ObjectId | string;
   message: string;
   read: boolean;
-  timestamp?: Date;
+  timestamp: Date;
+}
+
+
+export interface GroupedMessage {
+  date: string;
+  label: string;
+  messages: IChat[];
 }

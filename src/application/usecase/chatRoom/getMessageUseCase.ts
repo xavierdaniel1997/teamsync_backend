@@ -1,6 +1,6 @@
 
 import { GetMessagesDto } from "../../../domain/dtos/chatDTO";
-import { IChat } from "../../../domain/entities/chat";
+import { GroupedMessage, IChat } from "../../../domain/entities/chat";
 import { IChatRepo } from "../../../domain/repositories/chatRepo";
 import { IProjectRepo } from "../../../domain/repositories/projectRepo";
 
@@ -10,11 +10,8 @@ export class GetMessageUseCase {
         private projectRepository: IProjectRepo
     ) { }
 
-    async execute(dto: GetMessagesDto, currentUserId: string): Promise<IChat[]> {
+    async execute(dto: GetMessagesDto, currentUserId: string): Promise<GroupedMessage[]> {
         const { projectId, recipientId } = dto;
-        // if (!projectId || !recipientId) {
-        //     throw new Error("Missing required fields");
-        // }
 
         const project = await this.projectRepository.findById(projectId);
         if (!project) {
@@ -32,4 +29,4 @@ export class GetMessageUseCase {
         console.log("message form the get message usecase", message)
         return message;
     }
-}
+}   
