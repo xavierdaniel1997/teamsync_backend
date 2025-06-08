@@ -6,6 +6,9 @@ import { handleCheckOnline } from "./handlers/checkOnline";
 import { handleDisconnect } from "./handlers/disconnect";
 import { handleSendMessage } from "./handlers/sendMessage";
 import { handleStartTyping } from "./handlers/startTyping";
+import { handleMarkMessageAsRead } from "./handlers/markMessageAsRead";
+import { handleStopTyping } from "./handlers/stopTyping";
+import { handleUnreadedMessageCount } from "./handlers/unreadedMessageCount";
 
 interface AuthenticatedUser {
     userId: string;
@@ -36,7 +39,7 @@ export const setupChatSocket = (io: SocketIOServer) => {
             socket.disconnect();
         });
 
-        //socket coustom events
+        //socket coustom events  
 
         socket.on("register", (userId: string) => {
             if (socket.user?.userId === userId) {
@@ -47,7 +50,6 @@ export const setupChatSocket = (io: SocketIOServer) => {
         });
 
         socket.on('onlineStatus', (targetId: string) => {
-            console.log("called onlinstatus", targetId)
             handleCheckOnline(socket, targetId)
         })
 
@@ -68,18 +70,29 @@ export const setupChatSocket = (io: SocketIOServer) => {
             try {
                 await handleSendMessage(io, socket, projectId, senderId, recipientId, message)
             } catch (error) {
-                console.error("Error in sendMessage event:", error);
-                socket.emit("error", { message: "Failed to send message" });
-            }
+                console.error("Error in sendMessage event:", error);  
+                socket.emit("error", { message: "Failed to send message" });  
+            }   
 
         })
 
+        socket.on('markMessageAsRead', async ({messageId}: {messageId: string}) => {    
+            const userId = socket.user?.userId  
+            await handleMarkMessageAsRead(io, socket, messageId, userId!)
+        })
+
+        socket.on('fetchUnreadCounts', async (projectId: string,) => {
+            const recipientId = socket.user?.userId 
+            await handleUnreadedMessageCount(io, socket, projectId, recipientId!)    
+        })
+
+      
         socket.on('typing', ({senderId, recipientId}: {senderId: string, recipientId: string}) => {
-            handleStartTyping(io, senderId, recipientId)
+            handleStartTyping(io, senderId, recipientId)  
         })
-
+ 
         socket.on('stopTyping', ({senderId, recipientId} : {senderId: string, recipientId: string}) => {
-
+            handleStopTyping(io, senderId, recipientId)
         })
 
 
@@ -92,4 +105,4 @@ export const setupChatSocket = (io: SocketIOServer) => {
 
 
     })
-}
+}  

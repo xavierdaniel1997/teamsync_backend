@@ -14,7 +14,7 @@ import { setupChatSocket } from './interfaces/socket/chatSocket';
 const app: Application = express()
 const server = createServer(app)
 const io = initializeSocket(server)
-
+   
 const PORT: Number = 5000;
 
 dotenv.config()

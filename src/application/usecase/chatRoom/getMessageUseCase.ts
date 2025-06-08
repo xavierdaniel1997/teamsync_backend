@@ -26,7 +26,6 @@ export class GetMessageUseCase {
         }
 
         const message = await this.chatRepository.getConversation(projectId, currentUserId, recipientId)
-        console.log("message form the get message usecase", message)
         return message;
     }
 }   

@@ -6,8 +6,8 @@ export interface IChat {
   senderId: mongoose.Types.ObjectId | string;
   recipientId: mongoose.Types.ObjectId | string;
   message: string;
-  read: boolean;
   timestamp: Date;
+  read: boolean;
 }
 
 

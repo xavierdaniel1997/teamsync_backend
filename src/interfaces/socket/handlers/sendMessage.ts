@@ -2,11 +2,13 @@ import { Socket, Server as SocketIOServer } from "socket.io";
 import { ChatRepoImpl } from "../../../infrastructure/repositories/chatRepoImpl";
 import { ProjectRepoImpl } from "../../../infrastructure/repositories/projectRepoImpl";
 import { CreateMessageUseCase } from "../../../application/usecase/chatRoom/createMessageUseCase";
+import { GetUnreadMessageCountUseCase } from "../../../application/usecase/chatRoom/getUnreadMessageCount";
 
 
 const chatRepo = new ChatRepoImpl();
 const projectRepo = new ProjectRepoImpl();
 const createMessageUseCase = new CreateMessageUseCase(chatRepo, projectRepo);
+const getUnreadMessageCountUseCase = new GetUnreadMessageCountUseCase(chatRepo)
 
 export const handleSendMessage = async (
     io: SocketIOServer,
@@ -14,9 +16,8 @@ export const handleSendMessage = async (
     projectId: string,
     senderId: string,
     recipientId: string,
-    message: string,           
+    message: string,
 ) => {
-    console.log("message form the user", message)
     try {
         const chatMessage = await createMessageUseCase.execute({
             projectId,
@@ -25,6 +26,9 @@ export const handleSendMessage = async (
             message,
         })
         io.to(senderId).to(recipientId).emit('receiveMessage', chatMessage)
+
+        const unreadCounts = await getUnreadMessageCountUseCase.execute(projectId, recipientId);
+        io.to(recipientId).emit('unreadCounts', unreadCounts);
     } catch (error: any) {
         console.error("Error sending message:", error.message);
         socket.emit("error", { message: error.message || "Failed to send message" });

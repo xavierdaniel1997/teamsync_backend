@@ -27,7 +27,6 @@ export class CreateMessageUseCase {
         };
 
         const createdMessage = await this.chatRepository.saveMessage(chat)
-        console.log("created message save ", createdMessage)
         return createdMessage;
 
     }

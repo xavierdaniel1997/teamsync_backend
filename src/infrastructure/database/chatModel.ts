@@ -6,7 +6,7 @@ const chatSchema = new Schema<IChat & Document>({
   senderId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   recipientId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   message: { type: String, required: true },
-  read: { type: Boolean, default: false },
+  read: {type: Boolean, default: false},
   timestamp: { type: Date, default: Date.now },
 });
 

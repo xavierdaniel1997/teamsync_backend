@@ -6,5 +6,4 @@ export const handleRegister = (io: Server, socket: Socket, userId: string) => {
     const isonline = true;
     socket.emit("registerSuccess", { userId, isonline });   
     io.emit('onlineStatus', {userId, isonline})
-    console.log(`User ${userId} is now online and registered successfully`); 
 }                                         
