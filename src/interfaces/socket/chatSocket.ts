@@ -9,6 +9,7 @@ import { handleStartTyping } from "./handlers/startTyping";
 import { handleMarkMessageAsRead } from "./handlers/markMessageAsRead";
 import { handleStopTyping } from "./handlers/stopTyping";
 import { handleUnreadedMessageCount } from "./handlers/unreadedMessageCount";
+import { handleLastMessage } from "./handlers/lastMessage";
 
 interface AuthenticatedUser {
     userId: string;
@@ -20,8 +21,8 @@ interface AuthenticatedSocket extends Socket {
     user?: AuthenticatedUser;
 }
 
-const chatRepo = new ChatRepoImpl();
-const projectRepo = new ProjectRepoImpl();
+// const chatRepo = new ChatRepoImpl();
+// const projectRepo = new ProjectRepoImpl();
 
 
 export const setupChatSocket = (io: SocketIOServer) => {
@@ -81,9 +82,14 @@ export const setupChatSocket = (io: SocketIOServer) => {
             await handleMarkMessageAsRead(io, socket, messageId, userId!)
         })
 
-        socket.on('fetchUnreadCounts', async (projectId: string,) => {
+        socket.on('fetchUnreadCounts', async (projectId: string) => {
             const recipientId = socket.user?.userId 
             await handleUnreadedMessageCount(io, socket, projectId, recipientId!)    
+        })
+
+        socket.on('fetchLastMessage', async (projectId: string) => {
+            const currentUserId = socket.user?.userId;
+            await handleLastMessage(io, socket, projectId, currentUserId!)
         })
 
       
@@ -95,6 +101,11 @@ export const setupChatSocket = (io: SocketIOServer) => {
             handleStopTyping(io, senderId, recipientId)
         })
 
+        // video call sockets
+
+        
+
+        
 
         socket.on("disconnect", () => {
             if (userId) {

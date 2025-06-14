@@ -29,6 +29,11 @@ export const handleSendMessage = async (
 
         const unreadCounts = await getUnreadMessageCountUseCase.execute(projectId, recipientId);
         io.to(recipientId).emit('unreadCounts', unreadCounts);
+        io.to(senderId).to(recipientId).emit('updateLastMessage', {
+            senderId,
+            recipientId,
+            lastMessage: chatMessage,
+        });
     } catch (error: any) {
         console.error("Error sending message:", error.message);
         socket.emit("error", { message: error.message || "Failed to send message" });

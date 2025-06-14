@@ -1,20 +1,30 @@
 import { UpdateTaskDTO } from "../../../domain/dtos/updateTaskDTO";
+import { INotification, NotificationStatus } from "../../../domain/entities/notification";
 import { ProjectAccessLevel } from "../../../domain/entities/project";
 import { ITask } from "../../../domain/entities/task";
+import { INotificationRepo } from "../../../domain/repositories/notificationRepo";
 import { IProjectRepo } from "../../../domain/repositories/projectRepo";
 import { ISprintRepository } from "../../../domain/repositories/sprintRepo";
 import { ITaskRepository } from "../../../domain/repositories/taskRepository";
 import { IUserRepository } from "../../../domain/repositories/userRepo";
 import { IWorkSpaceRepo } from "../../../domain/repositories/workSpaceRepo";
+import { NotificationService } from "../../../domain/services/notificationService";
+import { CreateNotificationUseCase } from "../notificationUseCase/createNotificationUseCase";
+
 
 export class UpdateTaskUseCase {
+    private notificationUseCase: CreateNotificationUseCase;
     constructor(
         private taskRepo: ITaskRepository,
         private projectRepo: IProjectRepo,
         private userRepo: IUserRepository,
         private workspaceRepo: IWorkSpaceRepo,
         private sprintRepo: ISprintRepository,
-    ) { }
+        private notificationRepo: INotificationRepo,
+        private notificationService: NotificationService
+    ) {
+        this.notificationUseCase = new CreateNotificationUseCase(notificationRepo);
+    }
 
     async execute(dto: UpdateTaskDTO, userId: string): Promise<ITask> {
         const workspace = await this.workspaceRepo.findById(dto.workspace);
@@ -35,14 +45,14 @@ export class UpdateTaskUseCase {
             throw new Error("User does not have permission to create tasks");
         }
 
-        const existingTask = await this.taskRepo.findById(dto.taskId);  
+        const existingTask = await this.taskRepo.findById(dto.taskId);
         if (!existingTask) {
             throw new Error("Task not found");
         }
 
         const existingDuplicate = await this.taskRepo.findSameTaskExcludingId(dto.project, dto.title || "", dto.taskId)
-        if(existingDuplicate){
-             throw new Error("Another task with the same title already exists in this project");
+        if (existingDuplicate) {
+            throw new Error("Another task with the same title already exists in this project");
         }
 
 
@@ -62,15 +72,15 @@ export class UpdateTaskUseCase {
             updatedAt: new Date(),
         };
 
-                                                             
 
-         (Object.keys(taskData) as (keyof ITask)[]).forEach(
+
+        (Object.keys(taskData) as (keyof ITask)[]).forEach(
             (key) => taskData[key] === undefined && key !== 'sprint' && delete taskData[key]
         );
 
         if (dto.sprint !== undefined && dto.sprint !== existingTask.sprint) {
             if (existingTask.sprint && !dto.sprint) {
-                 console.log(`Removing task ${dto.taskId} from sprint ${existingTask.sprint}`);
+                console.log(`Removing task ${dto.taskId} from sprint ${existingTask.sprint}`);
                 await this.sprintRepo.update(existingTask.sprint.toString(), {
                     $pull: { tasks: dto.taskId },
                 });
@@ -97,11 +107,48 @@ export class UpdateTaskUseCase {
         }
 
 
-
-
         const updatedTask = await this.taskRepo.update(dto.taskId, taskData);
         if (!updatedTask) {
             throw new Error("Failed to update task");
+        }
+
+        // Trigger notifications for assignee changes
+        if (dto.assignee !== existingTask.assignee?.toString()) {
+            // Notify previous assignee about unassignment if they exist and are not the user performing the update
+            if (existingTask.assignee && existingTask.assignee.toString() !== userId) {
+                const unassignNotification = await this.notificationUseCase.execute(
+                    existingTask.assignee.toString(),
+                    "Task Unassigned",
+                    `You have been unassigned from task ${updatedTask.taskKey} task named ${updatedTask.title} in the project ${updatedTask.project.name} By ${updatedTask.reporter.fullName}
+                    check your board for more updates`,
+                    "description",
+                    updatedTask.reporter.fullName,
+                    "Task Unassignment",
+                    dto.taskId,
+                    dto.project,
+                    "TASK_UNASSIGNED",
+                    NotificationStatus.INFO
+                );
+                this.notificationService.notifyUser(unassignNotification);
+            }
+
+            // Notify new assignee about assignment if they exist and are not the user performing the update
+            if (dto.assignee && dto.assignee !== userId) {
+                const assignNotification = await this.notificationUseCase.execute(
+                    dto.assignee,
+                    "Task Assigned",
+                    `You have been assigned to task ${updatedTask.taskKey} task named ${updatedTask.title} in the project ${updatedTask.project.name} By ${updatedTask.reporter.fullName}  
+                    to start you work navigate to your backlog or board to seen the task`,
+                    "description",
+                    updatedTask.reporter.fullName,
+                    "Task Assignment",
+                    dto.taskId,
+                    dto.project,
+                    "TASK_ASSIGNED",
+                    NotificationStatus.WARNING
+                );
+                this.notificationService.notifyUser(assignNotification);
+            }
         }
 
         return updatedTask;

@@ -14,21 +14,46 @@ import { DeleteTaskUseCase } from "../../../../application/usecase/project/delet
 import { GetTasksBySprintStatusUseCase } from "../../../../application/usecase/project/getTasksBySprintStatusUseCase";
 import { GetAllTasksByProjectUseCase } from "../../../../application/usecase/project/getAllTasksByProjectUseCase";
 import { GetSprintTasksByStatusUseCase } from "../../../../application/usecase/project/getSprintTasksByStatusUseCase";
+import { INotificationRepoImpl } from "../../../../infrastructure/repositories/notificationRepoImpl";
+import { NotificationSocketService } from "../../../../infrastructure/services/notificationSocketService";
+import { Server as SocketIOServer } from "socket.io";
+
+
+
+
+
 
 const taskRepo = new ITaskRepositoryImp()
 const projectRepo = new ProjectRepoImpl()
 const userRepo = new userRepositoryImp()
 const workSpaceRepo = new WorkSpaceRepositoryImp()
 const sprintRepo = new SprintRepositoryImp()
+const notificationRepo = new INotificationRepoImpl();
+
+let io: SocketIOServer;
+let notificationService: NotificationSocketService;
+let updateTaskUseCase: UpdateTaskUseCase;
+
+
+
+export const setSocketIO = (socketIO: SocketIOServer) => {
+    io = socketIO;
+    notificationService = new NotificationSocketService(io);
+    updateTaskUseCase = new UpdateTaskUseCase(taskRepo, projectRepo, userRepo, workSpaceRepo, sprintRepo, notificationRepo, notificationService);
+};
+
 const createTaskUseCase = new CreateTaskUseCase(taskRepo, projectRepo, userRepo, workSpaceRepo, sprintRepo)
 const getEpicsByProjectUseCase = new GetEpicsByProjectUseCase(taskRepo, projectRepo, workSpaceRepo, userRepo)
 const getBacklogTasksUseCase = new GetBacklogTasksUseCase(taskRepo, projectRepo)
 const getTasksInSprintUseCase = new GetTasksInSprintUseCase(sprintRepo, projectRepo)
-const updateTaskUseCase = new UpdateTaskUseCase(taskRepo, projectRepo, userRepo, workSpaceRepo, sprintRepo)
+// const updateTaskUseCase = new UpdateTaskUseCase(taskRepo, projectRepo, userRepo, workSpaceRepo, sprintRepo)
 const deleteTaskUseCase = new DeleteTaskUseCase(taskRepo, projectRepo, userRepo, workSpaceRepo, sprintRepo)
 const getTasksBySprintStatusUseCase = new GetTasksBySprintStatusUseCase(taskRepo, projectRepo, workSpaceRepo)
 const getTasksByProjectUseCaseUseCase = new GetAllTasksByProjectUseCase(taskRepo, projectRepo, workSpaceRepo)
 const getSprintTasksByStatusUseCase = new GetSprintTasksByStatusUseCase(sprintRepo, projectRepo, workSpaceRepo, taskRepo)
+
+
+
 
 
 
@@ -42,7 +67,7 @@ const createTask = async (req: Request, res: Response): Promise<void> => {
         sendResponse(res, 400, null, error.message || "Failed to create task")
     }
 }
-   
+
 
 const getEpicByProject = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -54,6 +79,7 @@ const getEpicByProject = async (req: Request, res: Response): Promise<void> => {
         sendResponse(res, 400, null, error.message || "Failed to fetch the project epics")
     }
 }
+
 
 
 const updateTaskController = async (req: Request, res: Response): Promise<void> => {
@@ -105,13 +131,13 @@ const getTaskFromSprint = async (req: Request, res: Response): Promise<void> => 
 }
 
 const getAllTasksByProject = async (req: Request, res: Response): Promise<void> => {
-    try{
+    try {
         const userId = (req as any).user?.userId;
         const { workspaceId, projectId } = req.params;
         // console.log("for the get all task form prject ", workspaceId, projectId)
         const tasks = await getTasksByProjectUseCaseUseCase.execute(workspaceId, projectId, userId)
         sendResponse(res, 200, tasks, "successfull fetch the tasks")
-    }catch(error: any){
+    } catch (error: any) {
         sendResponse(res, 400, null, error.message || "failed fetch the tasks")
     }
 }
@@ -133,14 +159,14 @@ const getTaskBySprintStatus = async (req: Request, res: Response): Promise<void>
 }
 
 const getTaskInBoard = async (req: Request, res: Response): Promise<void> => {
-    try{
-         const userId = (req as any).user?.userId;
-        const { workspaceId, projectId} = req.params;
+    try {
+        const userId = (req as any).user?.userId;
+        const { workspaceId, projectId } = req.params;
         const tasks = await getSprintTasksByStatusUseCase.execute(workspaceId, projectId, userId)
         sendResponse(res, 200, tasks, "successfull fetch the tasks for kanban board")
-    }catch(error: any){
-        sendResponse(res, 400, null, error.message || "Failed to fetch the task")
+    } catch (error: any) {
+        sendResponse(res, 400, null, error.message || "Failed to fetch the task")   
     }
 }
 
-export { createTask, getEpicByProject, updateTaskController, deleteTaskController, getTasksController, getTaskFromSprint, getAllTasksByProject, getTaskBySprintStatus,  getTaskInBoard}
+export { createTask, getEpicByProject, updateTaskController, deleteTaskController, getTasksController, getTaskFromSprint, getAllTasksByProject, getTaskBySprintStatus, getTaskInBoard }

@@ -32,7 +32,7 @@ export class DeleteSprintUseCase {
         }
 
         const sprint = await this.sprintRepo.findById(sprintId);
-        console.log("sprint details form the deletesprint usecase", sprint)
+        // console.log("sprint details form the deletesprint usecase", sprint)
         if (!sprint) {
             throw new Error("Sprint not found");    
         }

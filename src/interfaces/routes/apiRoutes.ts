@@ -10,6 +10,7 @@ import planRoute from "./planRoutes";
 import adminUserManagmentRoute from "./adminUserManagmentRoutes"
 import adminWorkspaceManagmentRoute from "./adminWorkspaceManagmentRoutes"
 import chatRoomRoute from './chatRoomroutes'
+import notificationRoute from './notificationRoutes'
 
 const router = express.Router()
 
@@ -20,6 +21,7 @@ router.use("/workSpace", workSpaceRoute)
 router.use("/subscriptions", subscribeRoute)
 router.use("/project", projectAndTeamRoute)
 router.use("/chat", chatRoomRoute)
+router.use('/notification', notificationRoute)
 
 
 //admin

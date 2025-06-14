@@ -68,11 +68,11 @@ export class ChatRepoImpl implements IChatRepo {
         // console.log("from the markmessageas read chatimp", messageId)
         // const message = await ChatModel.findByIdAndUpdate(new mongoose.Types.ObjectId(messageId), { read: true });
         const message = await ChatModel.findByIdAndUpdate(
-                new mongoose.Types.ObjectId(messageId),
-                { $set: { read: true } },
-                { new: true } 
-            ).lean();
-            console.log("Updated message in ChatRepoImpl:", message);
+            new mongoose.Types.ObjectId(messageId),
+            { $set: { read: true } },
+            { new: true }
+        ).lean();
+        console.log("Updated message in ChatRepoImpl:", message);
         return message;
     }
 
@@ -84,7 +84,7 @@ export class ChatRepoImpl implements IChatRepo {
                     $match: {
                         projectId: new mongoose.Types.ObjectId(projectId),
                         recipientId: new mongoose.Types.ObjectId(recipientId),
-                        read: false,  
+                        read: false,
                     }
                 },
                 {
@@ -107,4 +107,15 @@ export class ChatRepoImpl implements IChatRepo {
         }
     }
 
+    async getLastMessage(projectId: string, currentUserId: string, memberId: string): Promise<IChat | null> {
+        const message = await ChatModel.findOne({
+            projectId: new mongoose.Types.ObjectId(projectId),
+            $or: [
+                { senderId: new mongoose.Types.ObjectId(memberId), recipientId: new mongoose.Types.ObjectId(currentUserId) },
+                { senderId: new mongoose.Types.ObjectId(currentUserId), recipientId: new mongoose.Types.ObjectId(memberId) },
+            ],
+        }).sort({ timestamp: -1 })      
+        return message;
+    }
+                      
 }

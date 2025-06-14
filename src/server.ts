@@ -10,6 +10,7 @@ import { configureCloudinary } from './config/cloudinary';
 import { initializeSocket } from './config/socket';
 import {createServer} from 'http';
 import { setupChatSocket } from './interfaces/socket/chatSocket';
+import { setSocketIO } from './interfaces/controller/user/projectAndTeam/taskController';
 
 const app: Application = express()
 const server = createServer(app)
@@ -39,6 +40,7 @@ app.use("/api", apiRoute)
 app.use(errorMiddleware)
 
 setupChatSocket(io)
+setSocketIO(io)
 
 server.listen(PORT, () => {
     console.log(`server starts at PORT ${PORT}`)

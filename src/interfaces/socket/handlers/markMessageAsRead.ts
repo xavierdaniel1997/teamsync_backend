@@ -33,6 +33,6 @@ export const handleMarkMessageAsRead = async (
         io.to(recipientId).emit('unreadCounts', unreadCounts);
 
     } catch (error: any) {
-        socket.emit('error', { message: `Failed to mark message as read: ${(error as Error).message}` });
+        socket.emit('error', { message: `Failed to mark message as read: ${(error as Error).message}` }); 
     }
 }

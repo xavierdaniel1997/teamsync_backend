@@ -7,4 +7,5 @@ export interface IChatRepo {
     findMessage(messageId: string): Promise<IChat | null>
     markMessagesAsRead(messageId: string): Promise<IChat | null>
     getUnreadMessageCount(projectId: string, senderId: string): Promise<{senderId: string; count: number }[]>;
+    getLastMessage(projectId: string, currentUserId: string, memberId: string) : Promise<IChat | null>
 }

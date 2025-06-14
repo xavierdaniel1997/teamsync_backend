@@ -55,7 +55,8 @@ export class ITaskRepositoryImp implements ITaskRepository {
     )
       .populate({ path: "epic", select: "title taskKey" })
       .populate({ path: "assignee", select: "-password" })
-      .populate({ path: "reporter", select: "-password" });
+      .populate({ path: "reporter", select: "-password" })
+      .populate({path: "project", select: "name"});
 
     return updatedTask as ITask | null;
   }
