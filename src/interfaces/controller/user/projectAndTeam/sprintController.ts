@@ -19,7 +19,7 @@ const projectRepo = new ProjectRepoImpl()
 const taskRepo = new ITaskRepositoryImp()
 const workspaceRepo = new WorkSpaceRepositoryImp()
 const notificationRepo = new INotificationRepoImpl(); 
-const io = new SocketIOServer(); 
+const io = new SocketIOServer();  
 const notificationService = new NotificationSocketService(io);
 const notificationUseCase = new CreateNotificationUseCase(notificationRepo);
 
