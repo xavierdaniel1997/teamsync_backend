@@ -5,7 +5,7 @@ import { socketAuth } from "../interfaces/middleware/authMiddleware";
 export const initializeSocket = (server: HTTPServer): SocketIOServer => {
     const io = new SocketIOServer(server, {
         cors: {
-            origin: "http://localhost:5173",
+            origin: "https://www.teamsync.buzz",
             credentials: true,
             methods: ["GET", "POST"],
         },

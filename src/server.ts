@@ -17,13 +17,13 @@ const server = createServer(app)
 const io = initializeSocket(server)
    
 const PORT: Number = 5000;
-
+    
 dotenv.config()
 configureCloudinary();
 connectDB()
 app.use(cookieParser())
 app.use(cors({
-    origin : "http://localhost:5173",
+    origin : "https://www.teamsync.buzz",
     credentials : true,
     allowedHeaders: ["Content-Type", "Authorization"]
 }))
