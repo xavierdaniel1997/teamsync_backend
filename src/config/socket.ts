@@ -3,9 +3,10 @@ import { Server as SocketIOServer, Socket } from "socket.io";
 import { socketAuth } from "../interfaces/middleware/authMiddleware";
 
 export const initializeSocket = (server: HTTPServer): SocketIOServer => {
+    console.log("from the socket initialatior", process.env.CLIENT_ORIGIN)
     const io = new SocketIOServer(server, {
         cors: {
-            origin: "https://www.teamsync.buzz",
+            origin: process.env.CLIENT_ORIGIN,
             credentials: true,
             methods: ["GET", "POST"],
         },

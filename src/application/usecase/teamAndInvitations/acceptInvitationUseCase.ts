@@ -24,7 +24,7 @@ export class AcceptInvitationUseCase{
         }   
         let user = userId ? await this.userRepo.findUserById(userId) : await this.userRepo.findByEmail(invitation.email);        
         if (!user) {
-            const redirectUrl = `http://localhost:5173/register?email=${invitation.email}&token=${token}`;
+            const redirectUrl = `${process.env.CLIENT_ORIGIN}/register?email=${invitation.email}&token=${token}`;
             return { invitation, redirectUrl, requiresRegistration: true, email: invitation.email };
         }
 
@@ -35,7 +35,7 @@ export class AcceptInvitationUseCase{
         const updatedInvitation = await this.invitationRepo.update(token, { status: InvitationStatus.ACCEPTED });
         if (!updatedInvitation) throw new Error("Failed to update invitation");
 
-        const redirectUrl = `http://localhost:5173/workspace/${invitation.workspace}/project/${invitation.project}`;
+        const redirectUrl = `${process.env.CLIENT_ORIGIN}/${invitation.workspace}/project/${invitation.project}`;
         return { invitation: updatedInvitation, redirectUrl, requiresRegistration: false, email: invitation.email };
     }
 }

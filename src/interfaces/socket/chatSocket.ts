@@ -33,6 +33,7 @@ export const setupChatSocket = (io: SocketIOServer) => {
         const userId = socket.user?.userId;
         if (userId) {
             socket.join(userId)
+            console.log("checking the user form the chatSocket", userId)
         }
 
         socket.on("error", (error) => {

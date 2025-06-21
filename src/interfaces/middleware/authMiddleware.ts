@@ -40,7 +40,7 @@ export const socketAuth = (socket: AuthenticatedSocket, next: (err?: ExtendedErr
             throw new Error("Authentication token missing");
         }
         const decoded = verifyAccessToken(token) as AuthenticatedUser;
-        // console.log("decoded user detail from the socketAuth", decoded)
+        console.log("decoded user detail from the socketAuth", decoded)
         socket.user = decoded;
         next();
     } catch (error: any) {

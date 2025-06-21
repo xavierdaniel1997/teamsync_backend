@@ -15,6 +15,8 @@ import { setSocketIO } from './interfaces/controller/user/projectAndTeam/taskCon
 const app: Application = express()
 const server = createServer(app)
 const io = initializeSocket(server)
+
+
    
 const PORT: Number = 5000;
     
@@ -24,9 +26,8 @@ connectDB()
 app.use(cookieParser())
 
 
-// const allowedOrigins = [process.env.NODE_ENV === 'development' ?  process.env.CLIENT_ORIGINS_LOCAL! : process.env.CLIENT_ORIGINS_PRODUCTION!];
 const allowedOrigins = process.env.CLIENT_ORIGIN
-console.log("form the server file allowedOrigin", allowedOrigins)
+// console.log("form the server file allowedOrigin", allowedOrigins)
 app.use(cors({
     origin : allowedOrigins,
     credentials : true,
@@ -44,9 +45,12 @@ app.use("/api", apiRoute)
 
 app.use(errorMiddleware)
 
+
 setupChatSocket(io)
 setSocketIO(io)
 
 server.listen(PORT, () => {
     console.log(`server starts at PORT ${PORT}`)
 })
+
+
