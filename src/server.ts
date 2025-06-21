@@ -22,8 +22,12 @@ dotenv.config()
 configureCloudinary();
 connectDB()
 app.use(cookieParser())
+
+
+const allowedOrigins = [process.env.NODE_ENV === 'development' ?  process.env.CLIENT_ORIGINS_LOCAL! : process.env.CLIENT_ORIGINS_PRODUCTION!];
+
 app.use(cors({
-    origin : "https://www.teamsync.buzz",
+    origin : allowedOrigins,
     credentials : true,
     allowedHeaders: ["Content-Type", "Authorization"]
 }))
