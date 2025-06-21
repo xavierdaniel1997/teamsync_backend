@@ -24,8 +24,9 @@ connectDB()
 app.use(cookieParser())
 
 
-const allowedOrigins = [process.env.NODE_ENV === 'development' ?  process.env.CLIENT_ORIGINS_LOCAL! : process.env.CLIENT_ORIGINS_PRODUCTION!];
-
+// const allowedOrigins = [process.env.NODE_ENV === 'development' ?  process.env.CLIENT_ORIGINS_LOCAL! : process.env.CLIENT_ORIGINS_PRODUCTION!];
+const allowedOrigins = process.env.CLIENT_ORIGIN
+console.log("form the server file allowedOrigin", allowedOrigins)
 app.use(cors({
     origin : allowedOrigins,
     credentials : true,
