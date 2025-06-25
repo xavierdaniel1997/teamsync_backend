@@ -5,8 +5,8 @@ import { IProjectRepo } from "../../../domain/repositories/projectRepo";
 export class GetBacklogTasksUseCase {
     constructor(
         private taskRepository: ITaskRepository,
-        private projectRepository: IProjectRepo
-    ) {}
+        private projectRepository: IProjectRepo 
+    ) { }
 
     async execute(userId: string, projectId: string): Promise<ITask[]> {
         if (!userId || !projectId) {
@@ -17,7 +17,7 @@ export class GetBacklogTasksUseCase {
         if (!project) {
             throw new Error("Unauthorized access to project");
         }
-        // console.log("checking the access of project form the getbacklogTasksUsecase", project)
+        // console.log("checking the form the getbacklogTasksUsecase assigne and epic", assignees, epics)
 
         const tasks = await this.taskRepository.findBacklogTasks(projectId);
         return tasks;

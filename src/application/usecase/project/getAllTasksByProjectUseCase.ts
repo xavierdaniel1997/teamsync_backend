@@ -10,7 +10,7 @@ export class GetAllTasksByProjectUseCase {
         private workspaceRepo: IWorkSpaceRepo,
     ) { }
 
-    async execute(workspaceId: string, projectId: string, userId: string): Promise<ITask[]> {
+    async execute(workspaceId: string, projectId: string, userId: string, assignees?: string[], epics?: string[]): Promise<ITask[]> {
          const workspace = await this.workspaceRepo.findById(workspaceId);
         if (!workspace) {
             throw new Error("Workspace not found");
@@ -21,7 +21,7 @@ export class GetAllTasksByProjectUseCase {
             throw new Error("Project not found or user does not have access");
         }
 
-        const tasks = await this.taskRepo.findTaskByProjects(projectId)
+        const tasks = await this.taskRepo.findTaskByProjects(projectId, assignees, epics)
         return tasks
     }
 }

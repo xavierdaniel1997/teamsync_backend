@@ -111,6 +111,7 @@ const getTasksController = async (req: Request, res: Response): Promise<void> =>
     try {
         const userId = (req as any).user?.userId;
         const { projectId } = req.params
+
         const backlogTasks = await getBacklogTasksUseCase.execute(userId, projectId)
         sendResponse(res, 200, backlogTasks, "successfull fetch the tasks")
     } catch (error: any) {
@@ -134,8 +135,33 @@ const getAllTasksByProject = async (req: Request, res: Response): Promise<void> 
     try {
         const userId = (req as any).user?.userId;
         const { workspaceId, projectId } = req.params;
-        // console.log("for the get all task form prject ", workspaceId, projectId)
-        const tasks = await getTasksByProjectUseCaseUseCase.execute(workspaceId, projectId, userId)
+
+        const { assignees, epics } = req.query;
+
+        let assigneesArray: string[] | undefined;
+        if (typeof assignees === 'string' && assignees.trim()) {
+            assigneesArray = assignees
+                .split(',')
+                .map(id => id.trim())
+                .filter(id => id);
+            if (assigneesArray.length === 0) {
+                throw new Error('Invalid assignee IDs provided');
+            }
+        }
+
+        // Parse and validate epics
+        let epicsArray: string[] | undefined;
+        if (typeof epics === 'string' && epics.trim()) {
+            epicsArray = epics
+                .split(',')
+                .map(id => id.trim())
+                .filter(id => id);
+            if (epicsArray.length === 0) {
+                throw new Error('Invalid epic IDs provided');
+            }
+        }
+
+        const tasks = await getTasksByProjectUseCaseUseCase.execute(workspaceId, projectId, userId, assigneesArray, epicsArray)
         sendResponse(res, 200, tasks, "successfull fetch the tasks")
     } catch (error: any) {
         sendResponse(res, 400, null, error.message || "failed fetch the tasks")
@@ -165,7 +191,7 @@ const getTaskInBoard = async (req: Request, res: Response): Promise<void> => {
         const tasks = await getSprintTasksByStatusUseCase.execute(workspaceId, projectId, userId)
         sendResponse(res, 200, tasks, "successfull fetch the tasks for kanban board")
     } catch (error: any) {
-        sendResponse(res, 400, null, error.message || "Failed to fetch the task")   
+        sendResponse(res, 400, null, error.message || "Failed to fetch the task")
     }
 }
 

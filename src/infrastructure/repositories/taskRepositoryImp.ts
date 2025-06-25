@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { SprintStatus } from "../../domain/entities/sprint";
 import { ITask, TaskType } from "../../domain/entities/task";
 import { ITaskRepository } from "../../domain/repositories/taskRepository";
@@ -47,6 +48,7 @@ export class ITaskRepositoryImp implements ITaskRepository {
   }
 
 
+
   async update(id: string, taskData: Partial<ITask>): Promise<ITask | null> {
     const updatedTask = await TaskModel.findByIdAndUpdate(
       id,
@@ -56,7 +58,7 @@ export class ITaskRepositoryImp implements ITaskRepository {
       .populate({ path: "epic", select: "title taskKey" })
       .populate({ path: "assignee", select: "-password" })
       .populate({ path: "reporter", select: "-password" })
-      .populate({path: "project", select: "name"});
+      .populate({ path: "project", select: "name" });
 
     return updatedTask as ITask | null;
   }
@@ -89,32 +91,51 @@ export class ITaskRepositoryImp implements ITaskRepository {
   }
 
 
-  //  async findTaskByProjects(projectId: string): Promise<ITask[]> {
-  //      return await TaskModel.find({project: projectId})
-  //  }
+  async findTaskByProjects(projectId: string, assignees?: string[], epics?: string[]): Promise<ITask[]> {
+  const query: any = {
+    project: projectId,
+    type: { $ne: TaskType.EPIC },
+  };
 
-  async findTaskByProjects(projectId: string): Promise<ITask[]> {
-    const tasks = await TaskModel.find({
-      project: projectId,
-      type: { $ne: TaskType.EPIC }, 
-    })
-      .select('taskKey title description type status priority assignee reporter epic sprint storyPoints files createdAt updatedAt project workspace')
-      .populate({ path: 'epic', select: 'title taskKey' })
-      .populate({ path: 'assignee', select: '-password' })
-      .populate({ path: 'reporter', select: '-password' })
-      .lean()
-      .exec();
-    return tasks as ITask[];
+  if (assignees && assignees.length > 0) {
+    const validAssignees = assignees.filter(id => mongoose.isValidObjectId(id));
+    if (validAssignees.length === 0) {
+      throw new Error('No valid assignee IDs provided');
+    }
+    query.assignee = { $in: validAssignees.map(id => new mongoose.Types.ObjectId(id)) };
   }
+
+  if (epics && epics.length > 0) {
+    const validEpics = epics.filter(id => mongoose.isValidObjectId(id));
+    if (validEpics.length === 0) {
+      throw new Error('No valid epic IDs provided');
+    }
+    query.epic = { $in: validEpics.map(id => new mongoose.Types.ObjectId(id)) };
+  }
+
+  const tasks = await TaskModel.find(query)
+    .select('taskKey title description type status priority assignee reporter epic sprint storyPoints files createdAt updatedAt project workspace')
+    .populate({ path: 'epic', select: 'title taskKey' })
+    .populate({ path: 'assignee', select: '-password' })
+    .populate({ path: 'reporter', select: '-password' })
+    .lean()
+    .exec();
+
+  return tasks as ITask[];
+}
+
+
+
+
 
 
   async findSameTask(projectId: string, title: string): Promise<ITask | null> {
-    const task = await TaskModel.findOne({project: projectId, title})
+    const task = await TaskModel.findOne({ project: projectId, title })
     return task;
   }
 
   async findSameTaskExcludingId(projecId: string, title: string, excludeTaskId: string): Promise<ITask | null> {
-    const task = await TaskModel.findOne({project: projecId, title, _id: {$ne: excludeTaskId}})
+    const task = await TaskModel.findOne({ project: projecId, title, _id: { $ne: excludeTaskId } })
     return task;
   }
 

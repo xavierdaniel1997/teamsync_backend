@@ -107,10 +107,6 @@ export class ProjectRepoImpl implements IProjectRepo {
         path: "members.user",
         select: "fullName secondName email avatar role secondName isVerified createdAt isRegComplet",
       })
-    //   .populate({
-    //     path: "owner",
-    //     select: "fullName secondName email avatar role secondName isVerified createdAt isRegComplet",
-    //   })
       .exec();
     if (!project) {
       throw new Error("Project not found");
