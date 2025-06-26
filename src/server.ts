@@ -11,6 +11,7 @@ import { initializeSocket } from './config/socket';
 import {createServer} from 'http';
 import { setupChatSocket } from './interfaces/socket/chatSocket';
 import { setSocketIO } from './interfaces/controller/user/projectAndTeam/taskController';
+import { rateLimit } from 'express-rate-limit'
 
 const app: Application = express()
 const server = createServer(app)
@@ -33,6 +34,14 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"]
 }))
 
+const rateLimiter = rateLimit({
+	windowMs: 15 * 60 * 1000,
+	limit: 100, 
+	standardHeaders: 'draft-8',
+	legacyHeaders: false,
+})
+
+app.use("/api", rateLimiter)
 
 app.post("/api/webhook", express.raw({type: "application/json"}), handleWebhook)
 app.use(express.json())

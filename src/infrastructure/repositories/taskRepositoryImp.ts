@@ -27,7 +27,7 @@ export class ITaskRepositoryImp implements ITaskRepository {
     return TaskModel.find({
       project: projectId,
       type: "EPIC",
-    })
+    }).populate({ path: "reporter", select: "-password" })
   }
 
 
