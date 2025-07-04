@@ -17,6 +17,8 @@ import { GetSprintTasksByStatusUseCase } from "../../../../application/usecase/p
 import { INotificationRepoImpl } from "../../../../infrastructure/repositories/notificationRepoImpl";
 import { NotificationSocketService } from "../../../../infrastructure/services/notificationSocketService";
 import { Server as SocketIOServer } from "socket.io";
+import { deleteFromCloudinary, uploadMultipleToCloudinary } from "../../../utils/uploadAssets";
+import { UpdateTaskDTO } from "domain/dtos/updateTaskDTO";
 
 
 
@@ -82,15 +84,105 @@ const getEpicByProject = async (req: Request, res: Response): Promise<void> => {
 
 
 
+// const updateTaskController = async (req: Request, res: Response): Promise<void> => {
+//     try {
+//         const userId = (req as any).user?.userId;
+//         const { workspaceId, projectId, taskId } = req.params;
+//         const taskData = { ...req.body, workspace: workspaceId, project: projectId, taskId };
+//         const task = await updateTaskUseCase.execute(taskData, userId)
+//         sendResponse(res, 200, task, "successfull updated the task")
+//     } catch (error: any) {
+//         sendResponse(res, 400, null, error.message || "Failed to edit the task")
+//     }
+// }
+
+
 const updateTaskController = async (req: Request, res: Response): Promise<void> => {
+    
     try {
         const userId = (req as any).user?.userId;
         const { workspaceId, projectId, taskId } = req.params;
-        const taskData = { ...req.body, workspace: workspaceId, project: projectId, taskId };
-        const task = await updateTaskUseCase.execute(taskData, userId)
-        sendResponse(res, 200, task, "successfull updated the task")
+
+        const { title, status, description, parent, assignee, startDate, endDate, subtasks, webLinks, reporter, type, priority, epicId, sprint } = req.body;
+
+        const parsedSubtasks = subtasks ? JSON.parse(subtasks) : [];
+        const parsedWebLinks = webLinks ? JSON.parse(webLinks) : [];
+
+        console.log("req.body form the updateTaskController sprint", sprint)
+
+        // Handle file uploads
+        let uploadedFiles: { url: string; publicId: string; fileName: string; fileType: string; size: number }[] = [];
+        if (req.files && Array.isArray(req.files)) {
+            const files = req.files as Express.Multer.File[];
+            const uploadOptions = {
+                folder: 'TeamSyncAssets/tasks',
+                quality: 90,
+                resource_type: 'auto' as const,    
+            };
+
+
+            const uploadedUrls = await uploadMultipleToCloudinary(files, uploadOptions);
+            uploadedFiles = uploadedUrls.map((url, index) => {
+                const file = files[index];
+                const publicId = url.split('/').pop()?.split('.')[0] || '';
+                return {
+                    url,
+                    publicId,
+                    fileName: file.originalname,
+                    fileType: file.mimetype,
+                    size: file.size,
+                    uploadedAt: new Date(),         
+                };     
+            });
+        }                 
+
+        const existingTask = await taskRepo.findById(taskId);
+        if (existingTask?.files?.length && uploadedFiles.length) {
+            for (const file of existingTask.files) {
+                await deleteFromCloudinary(file.url);
+            }
+        }
+
+        // console.log("uploaded files from the update task uploadedFiles..", uploadedFiles, "AND REQ.BODY", req.body)
+
+        const updateTaskDTO: UpdateTaskDTO = {
+            workspace: workspaceId,
+            project: projectId,
+            taskId,
+            title: title,
+            description,
+            type,
+            status,
+            priority,
+            assignee: assignee === '' || assignee === 'null' ? null: assignee,
+            epicId: epicId === '' || epicId === 'null' ? null : epicId,
+            parent,
+            sprint: sprint === '' || sprint === 'null' ? null : sprint,
+            // sprint,
+            files: uploadedFiles.length ? uploadedFiles : undefined,
+            startDate,   
+            endDate,
+            subtasks: parsedSubtasks,
+            // webLinks: parsedWebLinks,
+            webLinks: parsedWebLinks.length ? parsedWebLinks : undefined,
+        };
+
+        const updatedTask = await updateTaskUseCase.execute(updateTaskDTO, userId);
+        sendResponse(res, 200, updatedTask, "Task updated successfully");
+
+
     } catch (error: any) {
         sendResponse(res, 400, null, error.message || "Failed to edit the task")
+    }
+}
+
+
+
+const updateTaskInKanbanBoard = async (req: Request, res: Response): Promise<void> => {
+    try {
+        sendResponse(res, 200, null, "successfully update the task in kanban board")
+    } catch (error: any) {
+        sendResponse(res, 400, null, error.message || "Failed to edit the task in kanban board")
     }
 }
 
@@ -136,7 +228,7 @@ const getAllTasksByProject = async (req: Request, res: Response): Promise<void> 
         const userId = (req as any).user?.userId;
         const { workspaceId, projectId } = req.params;
 
-        const { assignees, epics } = req.query;
+        const { assignees, epics } = req.query;         
 
         let assigneesArray: string[] | undefined;
         if (typeof assignees === 'string' && assignees.trim()) {
@@ -151,7 +243,7 @@ const getAllTasksByProject = async (req: Request, res: Response): Promise<void> 
 
         // Parse and validate epics
         let epicsArray: string[] | undefined;
-        if (typeof epics === 'string' && epics.trim()) {
+        if (typeof epics === 'string' && epics.trim()) {          
             epicsArray = epics
                 .split(',')
                 .map(id => id.trim())
@@ -195,4 +287,4 @@ const getTaskInBoard = async (req: Request, res: Response): Promise<void> => {
     }
 }
 
-export { createTask, getEpicByProject, updateTaskController, deleteTaskController, getTasksController, getTaskFromSprint, getAllTasksByProject, getTaskBySprintStatus, getTaskInBoard }
+export { createTask, getEpicByProject, updateTaskController, deleteTaskController, getTasksController, getTaskFromSprint, getAllTasksByProject, getTaskBySprintStatus, getTaskInBoard, updateTaskInKanbanBoard }

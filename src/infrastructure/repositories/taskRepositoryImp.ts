@@ -98,7 +98,7 @@ export class ITaskRepositoryImp implements ITaskRepository {
   };
 
   if (assignees && assignees.length > 0) {
-    const validAssignees = assignees.filter(id => mongoose.isValidObjectId(id));
+    const validAssignees = assignees.filter(id => mongoose.isValidObjectId(id)); 
     if (validAssignees.length === 0) {
       throw new Error('No valid assignee IDs provided');
     }
@@ -114,7 +114,7 @@ export class ITaskRepositoryImp implements ITaskRepository {
   }
 
   const tasks = await TaskModel.find(query)
-    .select('taskKey title description type status priority assignee reporter epic sprint storyPoints files createdAt updatedAt project workspace')
+    .select('taskKey title description type status priority assignee reporter epic sprint storyPoints files createdAt updatedAt project workspace startDate endDate')
     .populate({ path: 'epic', select: 'title taskKey' })
     .populate({ path: 'assignee', select: '-password' })
     .populate({ path: 'reporter', select: '-password' })

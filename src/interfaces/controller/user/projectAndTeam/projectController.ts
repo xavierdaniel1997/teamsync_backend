@@ -61,7 +61,7 @@ const updateProject = async (req: Request, res: Response): Promise<void> => {
         let projectCoverImg: string | undefined;
         const existingProject = await projectRepo.findById(projectId)
         if (req.files && (req.files as any).projectCoverImg) {
-            console.log("req.file checking", req.files)
+            // console.log("req.file checking", req.files)
             const coverFile = (req.files as any).projectCoverImg[0];
             if (existingProject?.projectCoverImg) {
                 await deleteFromCloudinary(existingProject.projectCoverImg);

@@ -31,14 +31,13 @@ export interface IFile {
     fileName: string;
     fileType: string;
     size: number;
-    uploadedAt: Date;
+    uploadedAt?: Date;
 }
 
 
 export interface ITask {
     _id?: string;
     project: any;
-    // project: Types.ObjectId | string;
     workspace: Types.ObjectId | string;
     taskKey: string;
     title: string;
@@ -47,13 +46,16 @@ export interface ITask {
     status: TaskStatus;
     priority: TaskPriority;
     assignee?: Types.ObjectId | string ;
-    // reporter?: Types.ObjectId | string;
     reporter: any;
     epic?: Types.ObjectId | string;
     parent?: Types.ObjectId | string;
     sprint?: Types.ObjectId | string | null;
     storyPoints?: number;
-    files?: IFile[];
+    files?: IFile[] | undefined;
+    subtasks?: string[]; 
+    webLinks?: Array<{ url: string; linkText: string }>; 
+    startDate?: Date;
+    endDate?: Date; 
     createdAt: Date;
     updatedAt: Date;
 }

@@ -36,6 +36,13 @@ const taskSchema = new Schema<ITask & Document>({
     size: { type: Number, required: true },
     uploadedAt: { type: Date, default: Date.now }
   }],
+  subtasks: [{ type: Schema.Types.ObjectId, ref: "Task" }],
+  webLinks: [{
+    url: { type: String, required: true },
+    linkText: { type: String, required: true }
+  }],
+  startDate: { type: Date },
+  endDate: { type: Date },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

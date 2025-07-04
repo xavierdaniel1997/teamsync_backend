@@ -57,30 +57,74 @@ export class UpdateTaskUseCase {
 
 
 
-        const taskData: Partial<ITask> = {
-            title: dto.title,
-            description: dto.description,
-            type: dto.type,
-            status: dto.status,
-            priority: dto.priority,
-            assignee: dto.assignee,
-            epic: dto.epicId,
-            parent: dto.parent,
-            sprint: dto.sprint,
-            storyPoints: dto.storyPoints,
-            //   files: dto.files,
-            updatedAt: new Date(),
-        };
+        // const taskData: Partial<ITask> = {
+        //     title: dto.title,
+        //     description: dto.description,
+        //     type: dto.type,
+        //     status: dto.status,
+        //     priority: dto.priority,
+        //     assignee: dto.assignee,
+        //     epic: dto.epicId,
+        //     parent: dto.parent,
+        //     sprint: dto.sprint,   
+        //     storyPoints: dto.storyPoints,
+        //     files: dto.files, 
+        //     startDate: dto.startDate,
+        //     endDate: dto.endDate,  
+        //     subtasks: dto.subtasks,
+        //     webLinks: dto.webLinks,
+        //     updatedAt: new Date(),
+        // };
+
+
+         // --- CHANGE: Prepare update object with $set for scalar fields and $push for arrays ---
+    const updateData: any = {
+      $set: {
+        title: dto.title,
+        description: dto.description,
+        type: dto.type,
+        status: dto.status,
+        priority: dto.priority,
+        assignee: dto.assignee,
+        epic: dto.epicId,
+        parent: dto.parent,
+        sprint: dto.sprint,
+        storyPoints: dto.storyPoints,
+        subtasks: dto.subtasks,
+        startDate: dto.startDate,
+        endDate: dto.endDate,
+        updatedAt: new Date(),
+      },
+      // --- CHANGE: Use $push to append new files and webLinks ---
+      $push: {
+        files: dto.files ? { $each: dto.files } : undefined,
+        webLinks: dto.webLinks ? { $each: dto.webLinks } : undefined,
+      },
+    };
+
+    // --- CHANGE: Remove undefined fields from $set and $push ---
+    Object.keys(updateData.$set).forEach(
+      (key) => updateData.$set[key] === undefined && delete updateData.$set[key]
+    );
+    Object.keys(updateData.$push).forEach(
+      (key) => updateData.$push[key] === undefined && delete updateData.$push[key]
+    );
+
+    // --- CHANGE: Remove $push if empty ---
+    if (Object.keys(updateData.$push).length === 0) {
+      delete updateData.$push;
+    }
 
 
 
-        (Object.keys(taskData) as (keyof ITask)[]).forEach(
-            (key) => taskData[key] === undefined && key !== 'sprint' && delete taskData[key]
-        );
+
+        // (Object.keys(updateData) as (keyof ITask)[]).forEach(
+        //     (key) => updateData[key] === undefined && key !== 'sprint' && delete updateData[key]
+        // );
 
         if (dto.sprint !== undefined && dto.sprint !== existingTask.sprint) {
             if (existingTask.sprint && !dto.sprint) {
-                console.log(`Removing task ${dto.taskId} from sprint ${existingTask.sprint}`);
+                console.log(`A Removing task ${dto.taskId} from sprint ${existingTask.sprint}`);
                 await this.sprintRepo.update(existingTask.sprint.toString(), {
                     $pull: { tasks: dto.taskId },
                 });
@@ -91,10 +135,12 @@ export class UpdateTaskUseCase {
                 if (!sprint) {
                     throw new Error("Target sprint not found");
                 }
+                console.log(`B Removing task ${dto.taskId} from sprint ${existingTask.sprint}`)
                 await this.sprintRepo.addTask(dto.sprint, dto.taskId);
-            }
+            }  
 
             else if (existingTask.sprint && dto.sprint && existingTask.sprint.toString() !== dto.sprint) {
+                console.log(`C Removing task ${dto.taskId} from sprint ${existingTask.sprint}`)
                 await this.sprintRepo.update(existingTask.sprint.toString(), {
                     $pull: { tasks: dto.taskId },
                 });
@@ -107,7 +153,7 @@ export class UpdateTaskUseCase {
         }
 
 
-        const updatedTask = await this.taskRepo.update(dto.taskId, taskData);
+        const updatedTask = await this.taskRepo.update(dto.taskId, updateData);
         if (!updatedTask) {
             throw new Error("Failed to update task");
         }
@@ -151,7 +197,9 @@ export class UpdateTaskUseCase {
             }
         }
 
+        // console.log("from the update task usecase updateTask..", updatedTask)
+
         return updatedTask;
 
     }
-}
+}                  

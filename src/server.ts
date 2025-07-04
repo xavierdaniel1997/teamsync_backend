@@ -30,7 +30,7 @@ app.use(cookieParser())
 const allowedOrigins = process.env.CLIENT_ORIGIN
 app.use(cors({
     origin : allowedOrigins,
-    credentials : true,
+    credentials : true,                
     allowedHeaders: ["Content-Type", "Authorization"]
 }))
 
@@ -41,7 +41,7 @@ const rateLimiter = rateLimit({
 	legacyHeaders: false,
 })
 
-app.use("/api", rateLimiter)
+// app.use("/api", rateLimiter)
 
 app.post("/api/webhook", express.raw({type: "application/json"}), handleWebhook)
 app.use(express.json())

@@ -13,7 +13,7 @@ export const initializeSocket = (server: HTTPServer): SocketIOServer => {
     });
 
     io.use((socket: Socket, next) => {
-        socketAuth(socket, next);
+        socketAuth(socket, next);             
     });
 
     return io;
