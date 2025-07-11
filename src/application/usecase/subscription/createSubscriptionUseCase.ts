@@ -18,7 +18,7 @@ export class CreateSubscriptionUseCase {
         private workSpaceRepo: IWorkSpaceRepo,
         private planRepo: IPlanRepository,
         private stripeRepo: IStripeRepository,
-    ) { }
+    ) { } 
 
     async execute(subscriptionData: CreateSubscriptionDTO): Promise<{ subscription?: ISubscription; sessionId?: string }> {
         const { userId, workspaceId, planId, email } = subscriptionData;
@@ -27,7 +27,7 @@ export class CreateSubscriptionUseCase {
         if (!workspace || workspace._id?.toString() !== workspaceId) {
             throw new Error("Workspace not found or not owned by user")
         }
-
+ 
         const plan = await this.planRepo.findById(planId)
         if (!plan) throw new Error("Invalid plan selected")
         // console.log("this is the plan detilas", plan)
@@ -52,8 +52,8 @@ export class CreateSubscriptionUseCase {
             const customerId = await this.stripeRepo.createCustomer(email, userId);
 
 
-            const successUrl = `http://localhost:5173/success?workspaceId=${workspaceId}&planId=${planId}&userId=${userId}`;
-            const cancelUrl = `http://localhost:5173/cancel`;
+            const successUrl = `${process.env.CLIENT_ORIGIN}/success?workspaceId=${workspaceId}&planId=${planId}&userId=${userId}`;
+            const cancelUrl = `${process.env.CLIENT_ORIGIN}/cancel`;
             const sessionId = await this.stripeRepo.createCheckoutSession(customerId, plan.stripePriceId, successUrl, cancelUrl);
           
 
