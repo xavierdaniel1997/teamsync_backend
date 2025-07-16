@@ -24,7 +24,7 @@ export class CreateTaskUseCase {
 
         const project = await this.projectRepo.findUserAccess(dto.project, userId)
         if (!project) {
-            throw new Error("Project not found or user does not have access");
+            throw new Error("Project not found or user does not have access"); 
         }
         const isOwner = project.owner.toString() === userId;
         const member = project.members.find((member) => member.user.toString() === userId)
