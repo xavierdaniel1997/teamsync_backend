@@ -34,7 +34,6 @@ export class InviteTeamMemberUseCase {
             throw new Error("Project not found");
         }
 
-        // console.log("project details form the invite team usecase", project)
         const member = project.members.find((m) => m.user._id.toString() === userId);
         if (!member || ![ProjectAccessLevel.OWNER, ProjectAccessLevel.WRITE].includes(member.accessLevel)) {
             throw new Error("User lacks permission to invite members");
@@ -85,7 +84,7 @@ export class InviteTeamMemberUseCase {
                 console.log("invitationId pushed:", invitationId.toString()); 
 
                 const inviteLink = `${process.env.CLIENT_ORIGIN}/invite/accept?token=${token}`;
-                console.log("form the inviteTeamMemberUseCase", inviteLink)
+                // console.log("form the inviteTeamMemberUseCase", inviteLink)
                 const mailsend = await sendEmail(email, EmailType.INVITE, {
                     sender: "The Admin",  
                     teamName: project?.name,                     
@@ -96,7 +95,7 @@ export class InviteTeamMemberUseCase {
             const updateResult = await this.projectRepo.update(project._id!.toString(), {
                 $push: { invitations: { $each: invitationIds } },
             });
-            console.log("updatedResult form the invited team use case", updateResult)
+            // console.log("updatedResult form the invited team use case", updateResult)
             if (!updateResult || !updateResult.invitations) {
                 throw new Error(`Failed to add invitation IDs to project. Expected ${invitationIds.length} invitations, got ${updateResult?.invitations?.length || 0}`);
             }

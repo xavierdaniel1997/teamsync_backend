@@ -99,7 +99,7 @@ export class CreateProjectUseCase {
                 invitationIds.push(invitationId);
                 console.log("invitationId pushed:", invitationId.toString()); 
 
-                const inviteLink = `http://localhost:5173/invite/accept?token=${token}`;
+                const inviteLink = `${process.env.CLIENT_ORIGIN}/invite/accept?token=${token}`;
                 const mailsend = await sendEmail(email, EmailType.INVITE, {
                     sender: "The Admin",  
                     teamName: name,                     
