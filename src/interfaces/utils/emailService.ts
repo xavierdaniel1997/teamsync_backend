@@ -35,7 +35,7 @@ const emailTemplates = {
             html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
               <div style="text-align: center;">
-                    <img src="https://www.teamsync.buzz/assets/teamsync-log-Bon30fyx.png" alt="TeamSync Logo" style="width: 120px; margin-bottom: 20px;">
+                    <img src="https://www.teamsync.buzz/assets/teamsync-log-Bon30fyx.png" alt="TeamSync Logo" style="width: 100px; margin-bottom: 15px;">
                 </div>
                 <h2 style="color: #1A1A1A; text-align: center;">${data.sender} invited you to join them in TeamSync</h2>
                 <p style="color: #4A4A4A; text-align: center;">

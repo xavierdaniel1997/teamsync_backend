@@ -17,6 +17,8 @@ export interface IProject {
     projectCoverImg?: string;
     workspace: Types.ObjectId;
     owner: Types.ObjectId;
+    // color: string;
+    color: { class: string, hex: string };
     members: { user: Types.ObjectId; accessLevel: ProjectAccessLevel, }[];
     invitations?: IInvitation[];
     backlog?: string[];

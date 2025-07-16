@@ -9,6 +9,8 @@ const projectSchema = new Schema<IProject>({
     projectCoverImg: { type: String },
     workspace: { type: Schema.Types.ObjectId, ref: "WorkSpace", required: true },
     owner: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    // color: {type: String},
+    color: { class: {type: String}, hex: {type: String} },
     members: [
         {   
             user: { type: Schema.Types.ObjectId, ref: "User" },

@@ -14,6 +14,7 @@ interface CreateProjectDTO {
     name: string;
     projectkey: string;
     title?: string;
+    color?: {class: string, hex: string };
     description?: string;
     workspaceId: string;
     userId: string;
@@ -31,7 +32,7 @@ export class CreateProjectUseCase {
     ) { }
 
     async execute(projectData: CreateProjectDTO): Promise<IProject> {
-        const { name, projectkey, title, description, workspaceId, userId, emails = [], accessLevel = ProjectAccessLevel.READ} = projectData;
+        const { name, projectkey, title, color, description, workspaceId, userId, emails = [], accessLevel = ProjectAccessLevel.READ} = projectData;
 
         const workspace = await this.workSpaceRepo.findWorkSpaceByOwner(userId)
         // console.log("workspace form the project usecase", workspace)
@@ -59,7 +60,8 @@ export class CreateProjectUseCase {
         const projectDetails: Partial<IProject> = {
             name,
             projectkey, 
-            title,             
+            title, 
+            color,            
             description,
             workspace: new Types.ObjectId(workspaceId),
             owner: new Types.ObjectId(userId),
@@ -69,7 +71,7 @@ export class CreateProjectUseCase {
         }
 
 
-        const project = await this.projectRepo.create(projectDetails)
+        const project = await this.projectRepo.create(projectDetails)  
  
 
         await this.workSpaceRepo.updateWorkspaceProjects(workspaceId, project._id!.toString());
@@ -99,8 +101,7 @@ export class CreateProjectUseCase {
                 invitationIds.push(invitationId);
                 console.log("invitationId pushed:", invitationId.toString()); 
 
-                const inviteLink = `${process.env.CLIENT_ORIGIN}/invite/accept?token=${token}`;
-                console.log("checking the invitedLink in create project.......................", inviteLink)
+                const inviteLink = `${process.env.CLIENT_ORIGIN}/invite/accept?token=${token}`; 
                 const mailsend = await sendEmail(email, EmailType.INVITE, {
                     sender: "The Admin",  
                     teamName: name,                     

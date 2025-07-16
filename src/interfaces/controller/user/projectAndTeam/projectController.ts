@@ -32,9 +32,9 @@ const inviteTeamMemberUseCase = new InviteTeamMemberUseCase(projectRepo, workspa
 
 const createProject = async (req: Request, res: Response) => {     
     try {
-        const { name, projectkey, title, description, workspaceId, emails } = req.body;
+        const { name, projectkey, title, color, description, workspaceId, emails } = req.body;
         const userId = (req as any).user?.userId;
-        const project = await createProjectUseCase.execute({ name, projectkey, title, description, workspaceId, userId, emails })
+        const project = await createProjectUseCase.execute({ name, projectkey, title, color, description, workspaceId, userId, emails })
         const projectId = project._id?.toString();
         if (!projectId) {
             throw new Error("Project ID is undefined");

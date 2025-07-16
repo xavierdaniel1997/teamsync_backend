@@ -76,7 +76,6 @@ export class InviteTeamMemberUseCase {
                     createdAt: new Date(),
                 }
                 const createdInvitation = await this.invitationRepo.create(invitation)
-                // console.log("invited result", createdInvitation);
                 const invitationId = createdInvitation._id instanceof Types.ObjectId
                     ? createdInvitation._id
                     : new Types.ObjectId(createdInvitation._id);
@@ -84,7 +83,6 @@ export class InviteTeamMemberUseCase {
                 console.log("invitationId pushed:", invitationId.toString()); 
 
                 const inviteLink = `${process.env.CLIENT_ORIGIN}/invite/accept?token=${token}`;
-                // console.log("form the inviteTeamMemberUseCase", inviteLink)
                 const mailsend = await sendEmail(email, EmailType.INVITE, {
                     sender: "The Admin",  
                     teamName: project?.name,                     
@@ -95,7 +93,6 @@ export class InviteTeamMemberUseCase {
             const updateResult = await this.projectRepo.update(project._id!.toString(), {
                 $push: { invitations: { $each: invitationIds } },
             });
-            // console.log("updatedResult form the invited team use case", updateResult)
             if (!updateResult || !updateResult.invitations) {
                 throw new Error(`Failed to add invitation IDs to project. Expected ${invitationIds.length} invitations, got ${updateResult?.invitations?.length || 0}`);
             }
