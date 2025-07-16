@@ -44,7 +44,7 @@ export class CreateSubscriptionUseCase {
 
             if (!subscription._id) throw new Error("Subscription ID is undefined");
             await this.workSpaceRepo.updateWorkspaceSubscription(workspaceId, subscription._id.toString());
-            console.log("subscription free plan crated", subscription)       
+            // console.log("subscription free plan crated", subscription)       
             return { subscription };
         } else {
             if (!plan.stripePriceId) throw new Error("Stripe Price ID not configured for this plan");

@@ -85,6 +85,7 @@ export class InviteTeamMemberUseCase {
                 console.log("invitationId pushed:", invitationId.toString()); 
 
                 const inviteLink = `${process.env.CLIENT_ORIGIN}/invite/accept?token=${token}`;
+                console.log("form the inviteTeamMemberUseCase", inviteLink)
                 const mailsend = await sendEmail(email, EmailType.INVITE, {
                     sender: "The Admin",  
                     teamName: project?.name,                     
