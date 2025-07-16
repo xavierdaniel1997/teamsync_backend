@@ -100,6 +100,7 @@ export class CreateProjectUseCase {
                 console.log("invitationId pushed:", invitationId.toString()); 
 
                 const inviteLink = `${process.env.CLIENT_ORIGIN}/invite/accept?token=${token}`;
+                console.log("checking the invitedLink in create project.......................", inviteLink)
                 const mailsend = await sendEmail(email, EmailType.INVITE, {
                     sender: "The Admin",  
                     teamName: name,                     
