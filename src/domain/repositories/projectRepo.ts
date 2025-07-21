@@ -11,4 +11,5 @@ export interface IProjectRepo{
     update(projectId: string, updateData: any): Promise<IProject | null>
     updateMemberAccessLevel(projectId: string, memberId: string, newAccessLevel: ProjectAccessLevel): Promise<IProject | null>
     findMembersByProject(projectId: string): Promise<IProject>;
+    deleteProject(projectId: string): Promise<void>
 }

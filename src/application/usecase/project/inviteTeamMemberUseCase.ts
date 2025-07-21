@@ -86,7 +86,7 @@ export class InviteTeamMemberUseCase {
                 const mailsend = await sendEmail(email, EmailType.INVITE, {
                     sender: "The Admin",  
                     teamName: project?.name,                     
-                    inviteLink,                          
+                    inviteLink,                           
                 });
                 console.log("mail send", mailsend)
             }

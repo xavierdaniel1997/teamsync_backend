@@ -83,7 +83,7 @@ export class CreateProjectUseCase {
                 expiresAt.setDate(expiresAt.getDate() + 7);
 
                 const invitation = {
-                    email,
+                    email,     
                     inviter: new Types.ObjectId(userId),
                     project: project._id!,
                     workspace: new Types.ObjectId(workspaceId),
@@ -102,11 +102,12 @@ export class CreateProjectUseCase {
                 console.log("invitationId pushed:", invitationId.toString()); 
 
                 const inviteLink = `${process.env.CLIENT_ORIGIN}/invite/accept?token=${token}`; 
+                console.log("inviteLink", inviteLink);
                 const mailsend = await sendEmail(email, EmailType.INVITE, {
                     sender: "The Admin",  
                     teamName: name,                     
                     inviteLink,                          
-                });
+                });   
             }
             const updateResult = await this.projectRepo.update(project._id!.toString(), {
                 $push: { invitations: { $each: invitationIds } },

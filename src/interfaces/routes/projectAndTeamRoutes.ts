@@ -1,6 +1,6 @@
 import express from 'express';
 import { isAuth } from '../middleware/authMiddleware';
-import { createProject, getProjectById, getProjectDetails, getProjects, inviteMemberToProject, updateProject } from '../controller/user/projectAndTeam/projectController';
+import { createProject, deleteProject, getProjectById, getProjectDetails, getProjects, inviteMemberToProject, updateProject } from '../controller/user/projectAndTeam/projectController';
 import { acceptInvitation } from '../controller/user/teamAndInvitation/invitationController';
 import { createTask, deleteTaskController, getAllTasksByProject, getEpicByProject, getTaskBySprintStatus, getTaskFromSprint, getTaskInBoard, getTasksController, updateTaskController, updateTaskInKanbanBoard } from '../controller/user/projectAndTeam/taskController';
 import { createSprint, deleteSprint, getSprints, startSprint } from '../controller/user/projectAndTeam/sprintController';
@@ -15,6 +15,7 @@ router.get("/project-by-id/:projectId", isAuth, getProjectById)
 router.get("/project-details/:projectId", isAuth, getProjectDetails)  
 router.put("/edit-project/:projectId/:workspaceId", isAuth , upload.fields([{name: "projectCoverImg", maxCount: 1}]), updateProject)
 router.post("/invite-member/:projectId/:workspaceId", isAuth, inviteMemberToProject)
+router.delete("/delete-project/:projectId/:workspaceId", isAuth, deleteProject)
 
 
 // task routes

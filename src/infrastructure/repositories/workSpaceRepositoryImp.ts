@@ -11,7 +11,7 @@ export class WorkSpaceRepositoryImp implements IWorkSpaceRepo {
 
   async findWorkSpaceByOwner(ownerId: string): Promise<IWorkspace | null> {
     // const result = await WorkSpaceModel.findOne({owner: new Types.ObjectId(ownerId)})
-    const result = await WorkSpaceModel.findOne({ owner: ownerId });
+    const result = await WorkSpaceModel.findOne({ owner: ownerId }).populate("owner");
     return result;
   }
 

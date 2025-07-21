@@ -115,4 +115,8 @@ export class ProjectRepoImpl implements IProjectRepo {
     return project
   }
 
+  async deleteProject(projectId: string): Promise<void> {
+      await ProjectModel.findByIdAndDelete(projectId)
+  }
+
 }

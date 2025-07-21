@@ -14,6 +14,8 @@ import { SprintRepositoryImp } from "../../../../infrastructure/repositories/spr
 import { UpdateProjectUseCase } from "../../../../application/usecase/project/updateProjectUseCase";
 import { deleteFromCloudinary, uploadToCloudinary } from "../../../utils/uploadAssets";
 import { InviteTeamMemberUseCase } from "../../../../application/usecase/project/inviteTeamMemberUseCase";
+import { DeleteProjectUseCase } from "../../../../application/usecase/project/deleteProjectUseCase";
+
 
 
 const projectRepo = new ProjectRepoImpl()
@@ -29,6 +31,7 @@ const getWorkspaceProjectsUseCase = new GetWorkspaceProjectsUseCase(projectRepo,
 const getSingleProjectUseCase = new GetSingleProjectUseCase(projectRepo, userRepo)
 const createSprintUseCase = new CreateSprintUseCase(sprintRepo, projectRepo)
 const inviteTeamMemberUseCase = new InviteTeamMemberUseCase(projectRepo, workspaceRepo, subscriptionRepo, planRepo, invitationRepo)
+const deleteProjectUseCase = new DeleteProjectUseCase(projectRepo, workspaceRepo)
 
 const createProject = async (req: Request, res: Response) => {     
     try {
@@ -54,7 +57,7 @@ const createProject = async (req: Request, res: Response) => {
 const updateProject = async (req: Request, res: Response): Promise<void> => {
     console.log("req.body form the updateproject", req.body)
     try {
-        const { name, projectkey, description, title, memberId,
+        const { name, projectkey, description, title, memberId,   
       newAccessLevel, } = req.body;
         const userId = (req as any).user?.userId;
         const { projectId, workspaceId } = req.params;
@@ -142,6 +145,18 @@ const inviteMemberToProject = async (req: Request, res: Response): Promise<void>
         sendResponse(res, 400, null, error.message || "failed to invited team")
     }
 }
+
+const deleteProject = async (req: Request, res: Response): Promise<void> => {
+    try{
+        const {projectId, workspaceId} = req.params;
+        console.log("projectId", projectId)
+        const userId = (req as any).user?.userId;
+        await deleteProjectUseCase.execute(projectId, workspaceId, userId)
+        sendResponse(res, 200, null, "successfully deleted the project")
+    }catch(error: any){
+        sendResponse(res, 400, null, error.message || "failed to delete the project")
+    }
+}
      
 
-export { createProject, updateProject, getProjects, getProjectById, getProjectDetails, inviteMemberToProject }   
+export { createProject, updateProject, getProjects, getProjectById, getProjectDetails, inviteMemberToProject, deleteProject }   
