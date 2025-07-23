@@ -1,6 +1,6 @@
-import { UpdateQuery } from "mongoose";
+import mongoose, { UpdateQuery } from "mongoose";
 import { ISprint } from "../../domain/entities/sprint";
-import { ITask } from "../../domain/entities/task";
+import { ITask, TaskType } from "../../domain/entities/task";
 import { ISprintRepository } from "../../domain/repositories/sprintRepo";
 import SprintModel from "../database/sprintModel";
 
@@ -32,6 +32,8 @@ export class SprintRepositoryImp implements ISprintRepository {
     return sprints.map((sprint) => sprint.toObject());
   }
 
+  
+
 
   async addTask(sprintId: string, taskId: string): Promise<ISprint | null> {
     const sprint = await SprintModel.findByIdAndUpdate(
@@ -43,7 +45,7 @@ export class SprintRepositoryImp implements ISprintRepository {
   }
 
 
-  async findTasksInSprint(sprintId: string): Promise<ITask[]> {
+  async findTasksInSprint(sprintId: string, assignees?: string[], epics?: string[]): Promise<ITask[]> {
     const sprint = await SprintModel.findById(sprintId)
       .populate({
         path: "tasks",
@@ -58,6 +60,7 @@ export class SprintRepositoryImp implements ISprintRepository {
     if (!sprint) {
       throw new Error("Sprint not found");
     }
+    console.log("sprint imp sprint tasks", sprint)
     return sprint.tasks as unknown as ITask[];
   }
 

@@ -19,6 +19,7 @@ import { NotificationSocketService } from "../../../../infrastructure/services/n
 import { Server as SocketIOServer } from "socket.io";
 import { deleteFromCloudinary, uploadMultipleToCloudinary } from "../../../utils/uploadAssets";
 import { UpdateTaskDTO } from "domain/dtos/updateTaskDTO";
+import { GetKanbanTaskUseCase } from "../../../../application/usecase/project/getKanbanTaskUseCase";
 
 
 
@@ -53,6 +54,7 @@ const deleteTaskUseCase = new DeleteTaskUseCase(taskRepo, projectRepo, userRepo,
 const getTasksBySprintStatusUseCase = new GetTasksBySprintStatusUseCase(taskRepo, projectRepo, workSpaceRepo)
 const getTasksByProjectUseCaseUseCase = new GetAllTasksByProjectUseCase(taskRepo, projectRepo, workSpaceRepo)
 const getSprintTasksByStatusUseCase = new GetSprintTasksByStatusUseCase(sprintRepo, projectRepo, workSpaceRepo, taskRepo)
+const getKanbanTaskUseCase = new GetKanbanTaskUseCase(sprintRepo, projectRepo, workSpaceRepo, taskRepo)
 
 
 
@@ -84,21 +86,8 @@ const getEpicByProject = async (req: Request, res: Response): Promise<void> => {
 
 
 
-// const updateTaskController = async (req: Request, res: Response): Promise<void> => {
-//     try {
-//         const userId = (req as any).user?.userId;
-//         const { workspaceId, projectId, taskId } = req.params;
-//         const taskData = { ...req.body, workspace: workspaceId, project: projectId, taskId };
-//         const task = await updateTaskUseCase.execute(taskData, userId)
-//         sendResponse(res, 200, task, "successfull updated the task")
-//     } catch (error: any) {
-//         sendResponse(res, 400, null, error.message || "Failed to edit the task")
-//     }
-// }
-
-
 const updateTaskController = async (req: Request, res: Response): Promise<void> => {
-    
+
     try {
         const userId = (req as any).user?.userId;
         const { workspaceId, projectId, taskId } = req.params;
@@ -117,7 +106,7 @@ const updateTaskController = async (req: Request, res: Response): Promise<void> 
             const uploadOptions = {
                 folder: 'TeamSyncAssets/tasks',
                 quality: 90,
-                resource_type: 'auto' as const,    
+                resource_type: 'auto' as const,
             };
 
 
@@ -131,10 +120,10 @@ const updateTaskController = async (req: Request, res: Response): Promise<void> 
                     fileName: file.originalname,
                     fileType: file.mimetype,
                     size: file.size,
-                    uploadedAt: new Date(),         
-                };     
+                    uploadedAt: new Date(),
+                };
             });
-        }                 
+        }
 
         const existingTask = await taskRepo.findById(taskId);
         if (existingTask?.files?.length && uploadedFiles.length) {
@@ -154,13 +143,13 @@ const updateTaskController = async (req: Request, res: Response): Promise<void> 
             type,
             status,
             priority,
-            assignee: assignee === '' || assignee === 'null' ? null: assignee,
+            assignee: assignee === '' || assignee === 'null' ? null : assignee,
             epicId: epicId === '' || epicId === 'null' ? null : epicId,
             parent,
             sprint: sprint === '' || sprint === 'null' ? null : sprint,
             // sprint,
             files: uploadedFiles.length ? uploadedFiles : undefined,
-            startDate,   
+            startDate,
             endDate,
             subtasks: parsedSubtasks,
             // webLinks: parsedWebLinks,
@@ -176,15 +165,6 @@ const updateTaskController = async (req: Request, res: Response): Promise<void> 
     }
 }
 
-
-
-const updateTaskInKanbanBoard = async (req: Request, res: Response): Promise<void> => {
-    try {
-        sendResponse(res, 200, null, "successfully update the task in kanban board")
-    } catch (error: any) {
-        sendResponse(res, 400, null, error.message || "Failed to edit the task in kanban board")
-    }
-}
 
 
 const deleteTaskController = async (req: Request, res: Response): Promise<void> => {
@@ -228,7 +208,7 @@ const getAllTasksByProject = async (req: Request, res: Response): Promise<void> 
         const userId = (req as any).user?.userId;
         const { workspaceId, projectId } = req.params;
 
-        const { assignees, epics } = req.query;         
+        const { assignees, epics } = req.query;
 
         let assigneesArray: string[] | undefined;
         if (typeof assignees === 'string' && assignees.trim()) {
@@ -243,7 +223,7 @@ const getAllTasksByProject = async (req: Request, res: Response): Promise<void> 
 
         // Parse and validate epics
         let epicsArray: string[] | undefined;
-        if (typeof epics === 'string' && epics.trim()) {          
+        if (typeof epics === 'string' && epics.trim()) {
             epicsArray = epics
                 .split(',')
                 .map(id => id.trim())
@@ -259,6 +239,7 @@ const getAllTasksByProject = async (req: Request, res: Response): Promise<void> 
         sendResponse(res, 400, null, error.message || "failed fetch the tasks")
     }
 }
+
 
 const getTaskBySprintStatus = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -276,10 +257,12 @@ const getTaskBySprintStatus = async (req: Request, res: Response): Promise<void>
     }
 }
 
+//listing task in kanban board
 const getTaskInBoard = async (req: Request, res: Response): Promise<void> => {
     try {
         const userId = (req as any).user?.userId;
         const { workspaceId, projectId } = req.params;
+
         const tasks = await getSprintTasksByStatusUseCase.execute(workspaceId, projectId, userId)
         sendResponse(res, 200, tasks, "successfull fetch the tasks for kanban board")
     } catch (error: any) {
@@ -287,4 +270,60 @@ const getTaskInBoard = async (req: Request, res: Response): Promise<void> => {
     }
 }
 
-export { createTask, getEpicByProject, updateTaskController, deleteTaskController, getTasksController, getTaskFromSprint, getAllTasksByProject, getTaskBySprintStatus, getTaskInBoard, updateTaskInKanbanBoard }
+const getTaskInKanban = async (req: Request, res: Response): Promise<void> => {
+   try{
+     const userId = (req as any).user?.userId;
+    const { workspaceId, projectId } = req.params;
+    const { assignees, epics } = req.query;
+
+    let assigneesArray: string[] | undefined;
+    if (typeof assignees === 'string' && assignees.trim()) {
+        assigneesArray = assignees
+            .split(',')
+            .map(id => id.trim())
+            .filter(id => id);
+        if (assigneesArray.length === 0) {
+            throw new Error('Invalid assignee IDs provided');
+        }
+    }
+
+    let epicsArray: string[] | undefined;
+    if (typeof epics === 'string' && epics.trim()) {
+        epicsArray = epics
+            .split(',')
+            .map(id => id.trim())
+            .filter(id => id);
+        if (epicsArray.length === 0) {
+            throw new Error('Invalid epic IDs provided');
+        }
+    }
+    const task = await getKanbanTaskUseCase.execute(workspaceId, projectId, userId)
+    sendResponse(res, 200, null, "successfull fetch the tasks for kanban board with filter")
+   }catch(error: any){
+    sendResponse(res, 400, null, error.message || "Failed to fetch the task with filter")
+   }
+}
+
+const updateKanbanTask = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const userId = (req as any).user?.userId;
+        const { workspaceId, projectId, taskId } = req.params;
+        sendResponse(res, 200, null, "successfully update the task in kanban board")
+    } catch (error: any) {
+        sendResponse(res, 400, null, error.message || "Failed to edit the task in kanban board")
+    }
+}
+
+export {
+    createTask,
+    getEpicByProject,
+    updateTaskController,
+    deleteTaskController,
+    getTasksController,
+    getTaskFromSprint,
+    getAllTasksByProject,
+    getTaskBySprintStatus,
+    getTaskInBoard,
+    updateKanbanTask,
+    getTaskInKanban
+}

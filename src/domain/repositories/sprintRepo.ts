@@ -9,6 +9,7 @@ export interface ISprintRepository {
   update(id: string, updates: UpdateQuery<ISprint>): Promise<ISprint | null>;
   findByProject(projectId: string): Promise<ISprint[]>;
   addTask(sprintId: string, taskId: string): Promise<ISprint | null>;
+  // findTasksInSprint(sprintId: string, assignees?: string[], epics?: string[]): Promise<ITask[]>;
   findTasksInSprint(sprintId: string): Promise<ITask[]>;
   delete(id: string): Promise<void>;
 }

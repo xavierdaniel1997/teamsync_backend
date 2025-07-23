@@ -23,7 +23,7 @@ export class GetSprintTasksByStatusUseCase {
         if (!project) {
             throw new Error("Project not found or user does not have access");
         }
-
+ 
         const sprints = await this.sprintRepo.findByProject(projectId);
 
         const activeSprints = sprints.filter((sprint) => sprint.status === SprintStatus.ACTIVE);

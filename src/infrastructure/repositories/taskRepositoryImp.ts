@@ -94,7 +94,7 @@ export class ITaskRepositoryImp implements ITaskRepository {
   async findTaskByProjects(projectId: string, assignees?: string[], epics?: string[]): Promise<ITask[]> {
   const query: any = {
     project: projectId,
-    type: { $ne: TaskType.EPIC },
+    type: { $ne: TaskType.EPIC }, 
   };
 
   if (assignees && assignees.length > 0) {

@@ -7,7 +7,7 @@ export class GetAllTasksByProjectUseCase {
     constructor(
         private taskRepo: ITaskRepository,
         private projectRepo: IProjectRepo,
-        private workspaceRepo: IWorkSpaceRepo,
+        private workspaceRepo: IWorkSpaceRepo, 
     ) { }
 
     async execute(workspaceId: string, projectId: string, userId: string, assignees?: string[], epics?: string[]): Promise<ITask[]> {

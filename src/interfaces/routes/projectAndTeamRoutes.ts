@@ -2,7 +2,7 @@ import express from 'express';
 import { isAuth } from '../middleware/authMiddleware';
 import { createProject, deleteProject, getProjectById, getProjectDetails, getProjects, inviteMemberToProject, updateProject } from '../controller/user/projectAndTeam/projectController';
 import { acceptInvitation } from '../controller/user/teamAndInvitation/invitationController';
-import { createTask, deleteTaskController, getAllTasksByProject, getEpicByProject, getTaskBySprintStatus, getTaskFromSprint, getTaskInBoard, getTasksController, updateTaskController, updateTaskInKanbanBoard } from '../controller/user/projectAndTeam/taskController';
+import { createTask, deleteTaskController, getAllTasksByProject, getEpicByProject, getTaskBySprintStatus, getTaskFromSprint, getTaskInBoard, getTasksController, updateTaskController, updateKanbanTask, getTaskInKanban } from '../controller/user/projectAndTeam/taskController';
 import { createSprint, deleteSprint, getSprints, startSprint } from '../controller/user/projectAndTeam/sprintController';
 import { upload } from '../middleware/upload';
 
@@ -30,7 +30,8 @@ router.get("/sprint-tasks/:workspaceId/:projectId/:sprintId", isAuth, getTaskFro
 router.get("/all-tasks/:workspaceId/:projectId", isAuth, getAllTasksByProject)
 router.get("/taskby-sprintstatus/:workspaceId/:projectId", isAuth, getTaskBySprintStatus)
 router.get("/active-tasks/:workspaceId/:projectId", isAuth, getTaskInBoard)
-router.post("/update-kanban-task", isAuth, updateTaskInKanbanBoard)
+router.post("/update-kanban-task/:workspaceId/:projectId/:taskId", isAuth, updateKanbanTask)
+router.get("/kanban-tasks/:workspaceId/:projectId", isAuth, getTaskInKanban)
 
 
 //sprint routes
