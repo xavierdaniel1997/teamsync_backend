@@ -20,6 +20,7 @@ import { Server as SocketIOServer } from "socket.io";
 import { deleteFromCloudinary, uploadMultipleToCloudinary } from "../../../utils/uploadAssets";
 import { UpdateTaskDTO } from "domain/dtos/updateTaskDTO";
 import { GetKanbanTaskUseCase } from "../../../../application/usecase/project/getKanbanTaskUseCase";
+import { UpdateKanbanTaskUseCase } from "../../../../application/usecase/project/updateKanbanTaskUseCase";
 
 
 
@@ -55,6 +56,7 @@ const getTasksBySprintStatusUseCase = new GetTasksBySprintStatusUseCase(taskRepo
 const getTasksByProjectUseCaseUseCase = new GetAllTasksByProjectUseCase(taskRepo, projectRepo, workSpaceRepo)
 const getSprintTasksByStatusUseCase = new GetSprintTasksByStatusUseCase(sprintRepo, projectRepo, workSpaceRepo, taskRepo)
 const getKanbanTaskUseCase = new GetKanbanTaskUseCase(sprintRepo, projectRepo, workSpaceRepo, taskRepo)
+const updateKanbanTaskUseCase = new UpdateKanbanTaskUseCase(taskRepo, projectRepo, userRepo, workSpaceRepo, sprintRepo)
 
 
 
@@ -265,7 +267,7 @@ const getTaskInBoard = async (req: Request, res: Response): Promise<void> => {
 
         const tasks = await getSprintTasksByStatusUseCase.execute(workspaceId, projectId, userId)
         sendResponse(res, 200, tasks, "successfull fetch the tasks for kanban board")
-    } catch (error: any) {
+    } catch (error: any) {             
         sendResponse(res, 400, null, error.message || "Failed to fetch the task")
     }
 }
@@ -284,21 +286,21 @@ const getTaskInKanban = async (req: Request, res: Response): Promise<void> => {
             .filter(id => id);
         if (assigneesArray.length === 0) {
             throw new Error('Invalid assignee IDs provided');
-        }
+        };
     }
 
     let epicsArray: string[] | undefined;
     if (typeof epics === 'string' && epics.trim()) {
         epicsArray = epics
-            .split(',')
+            .split(',')   
             .map(id => id.trim())
             .filter(id => id);
         if (epicsArray.length === 0) {
             throw new Error('Invalid epic IDs provided');
         }
     }
-    const task = await getKanbanTaskUseCase.execute(workspaceId, projectId, userId)
-    sendResponse(res, 200, null, "successfull fetch the tasks for kanban board with filter")
+    const task = await getKanbanTaskUseCase.execute(workspaceId, projectId, userId, assigneesArray, epicsArray)
+    sendResponse(res, 200, task, "successfull fetch the tasks for kanban board with filter")
    }catch(error: any){
     sendResponse(res, 400, null, error.message || "Failed to fetch the task with filter")
    }
@@ -306,9 +308,11 @@ const getTaskInKanban = async (req: Request, res: Response): Promise<void> => {
 
 const updateKanbanTask = async (req: Request, res: Response): Promise<void> => {
     try {
+        const {status} = req.body
         const userId = (req as any).user?.userId;
         const { workspaceId, projectId, taskId } = req.params;
-        sendResponse(res, 200, null, "successfully update the task in kanban board")
+        const task = await updateKanbanTaskUseCase.execute(workspaceId, projectId, taskId, userId, status)
+        sendResponse(res, 200, task, "successfully update the task in kanban board")
     } catch (error: any) {
         sendResponse(res, 400, null, error.message || "Failed to edit the task in kanban board")
     }

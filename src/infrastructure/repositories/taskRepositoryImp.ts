@@ -30,6 +30,13 @@ export class ITaskRepositoryImp implements ITaskRepository {
     }).populate({ path: "reporter", select: "-password" })
   }
 
+  async findTasksByEpic(epicId: string): Promise<ITask[]> {
+    return TaskModel.find({ epic: epicId })
+      .select('status')
+      .lean();
+  }
+
+
 
   async findBacklogTasks(projectId: string): Promise<ITask[]> {
     const tasks = await TaskModel.find({
@@ -92,37 +99,37 @@ export class ITaskRepositoryImp implements ITaskRepository {
 
 
   async findTaskByProjects(projectId: string, assignees?: string[], epics?: string[]): Promise<ITask[]> {
-  const query: any = {
-    project: projectId,
-    type: { $ne: TaskType.EPIC }, 
-  };
+    const query: any = {
+      project: projectId,
+      type: { $ne: TaskType.EPIC },
+    };
 
-  if (assignees && assignees.length > 0) {
-    const validAssignees = assignees.filter(id => mongoose.isValidObjectId(id)); 
-    if (validAssignees.length === 0) {
-      throw new Error('No valid assignee IDs provided');
+    if (assignees && assignees.length > 0) {
+      const validAssignees = assignees.filter(id => mongoose.isValidObjectId(id));
+      if (validAssignees.length === 0) {
+        throw new Error('No valid assignee IDs provided');
+      }
+      query.assignee = { $in: validAssignees.map(id => new mongoose.Types.ObjectId(id)) };
     }
-    query.assignee = { $in: validAssignees.map(id => new mongoose.Types.ObjectId(id)) };
-  }
 
-  if (epics && epics.length > 0) {
-    const validEpics = epics.filter(id => mongoose.isValidObjectId(id));
-    if (validEpics.length === 0) {
-      throw new Error('No valid epic IDs provided');
+    if (epics && epics.length > 0) {
+      const validEpics = epics.filter(id => mongoose.isValidObjectId(id));
+      if (validEpics.length === 0) {
+        throw new Error('No valid epic IDs provided');
+      }
+      query.epic = { $in: validEpics.map(id => new mongoose.Types.ObjectId(id)) };
     }
-    query.epic = { $in: validEpics.map(id => new mongoose.Types.ObjectId(id)) };
+
+    const tasks = await TaskModel.find(query)
+      .select('taskKey title description type status priority assignee reporter epic sprint storyPoints files createdAt updatedAt project workspace startDate endDate')
+      .populate({ path: 'epic', select: 'title taskKey' })
+      .populate({ path: 'assignee', select: '-password' })
+      .populate({ path: 'reporter', select: '-password' })
+      .lean()
+      .exec();
+
+    return tasks as ITask[];
   }
-
-  const tasks = await TaskModel.find(query)
-    .select('taskKey title description type status priority assignee reporter epic sprint storyPoints files createdAt updatedAt project workspace startDate endDate')
-    .populate({ path: 'epic', select: 'title taskKey' })
-    .populate({ path: 'assignee', select: '-password' })
-    .populate({ path: 'reporter', select: '-password' })
-    .lean()
-    .exec();
-
-  return tasks as ITask[];
-}
 
 
 

@@ -30,13 +30,13 @@ router.get("/sprint-tasks/:workspaceId/:projectId/:sprintId", isAuth, getTaskFro
 router.get("/all-tasks/:workspaceId/:projectId", isAuth, getAllTasksByProject)
 router.get("/taskby-sprintstatus/:workspaceId/:projectId", isAuth, getTaskBySprintStatus)
 router.get("/active-tasks/:workspaceId/:projectId", isAuth, getTaskInBoard)
-router.post("/update-kanban-task/:workspaceId/:projectId/:taskId", isAuth, updateKanbanTask)
+router.put("/update-kanban-task/:workspaceId/:projectId/:taskId", isAuth, updateKanbanTask)
 router.get("/kanban-tasks/:workspaceId/:projectId", isAuth, getTaskInKanban)
 
 
 //sprint routes
 
-router.post("/create-sprint", isAuth, createSprint)    
+router.post("/create-sprint", isAuth, createSprint)          
 router.get("/sprints/:projectId", isAuth, getSprints)
 router.delete("/delete-sprint/:workspaceId/:projectId/:sprintId", isAuth, deleteSprint)   
 router.post("/start-sprint/:workspaceId/:projectId/:sprintId", isAuth, startSprint)

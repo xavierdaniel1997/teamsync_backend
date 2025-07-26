@@ -60,7 +60,29 @@ export class SprintRepositoryImp implements ISprintRepository {
     if (!sprint) {
       throw new Error("Sprint not found");
     }
-    console.log("sprint imp sprint tasks", sprint)
+    return sprint.tasks as unknown as ITask[];
+  }
+
+  async findFilterTaskInsprint(sprintId: string, assignees?: string[], epics?: string[]): Promise<ITask[]> {
+    const sprint = await SprintModel.findById(sprintId)
+    .populate({
+      path: "tasks",    
+      match: {
+        ...(assignees && assignees.length > 0 ? { assignee: { $in: assignees } } : {}),
+        ...(epics && epics.length > 0 ? { epic: { $in: epics } } : {}),
+      },
+      populate: [
+        { path: "epic", select: "title taskKey" },
+        { path: "assignee", select: "-password" },
+        { path: "reporter", select: "-password" },
+      ],              
+    })
+    .exec();
+
+    if (!sprint) {
+      throw new Error("Sprint not found");
+    }
+
     return sprint.tasks as unknown as ITask[];
   }
 

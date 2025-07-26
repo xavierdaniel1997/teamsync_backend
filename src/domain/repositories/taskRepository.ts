@@ -6,6 +6,7 @@ export interface ITaskRepository{
     findById(id: string): Promise<ITask | null>
     findBykey(key: string): Promise<ITask | null>
     findEpicsByProject(projectId: string): Promise<ITask[]>;
+    findTasksByEpic(epicId: string): Promise<ITask[]>;
     findBacklogTasks(projectId: string): Promise<ITask[]>;
     update(id: string, taskData: Partial<ITask>): Promise<ITask | null>;
     delete(taskId: string): Promise<void>;
