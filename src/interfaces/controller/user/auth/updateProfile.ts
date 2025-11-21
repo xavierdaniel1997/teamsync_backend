@@ -28,7 +28,7 @@ const updateProfile = async (req: Request, res: Response): Promise<void> => {
         const updateData: any = { userId, email, fullName, secondName };
         if (req.files && (req.files as any).avatar) {
             const avatarFile = (req.files as any).avatar[0];
-            if (existingUser?.avatar) {
+            if (existingUser?.avatar) { 
                 await deleteFromCloudinary(existingUser.avatar);
             }
             updateData.avatar = await uploadToCloudinary(avatarFile, {

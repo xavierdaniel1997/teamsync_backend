@@ -1,5 +1,5 @@
 import { ITask, KanbanStatusGroup, TaskStatus } from "../../../domain/entities/task";
-import { SprintStatus } from "../../../domain/entities/sprint";
+import { ISprint, SprintStatus } from "../../../domain/entities/sprint";
 import { IProjectRepo } from "../../../domain/repositories/projectRepo";
 import { ISprintRepository } from "../../../domain/repositories/sprintRepo";
 import { ITaskRepository } from "../../../domain/repositories/taskRepository";
@@ -33,9 +33,11 @@ export class GetKanbanTaskUseCase {
 
         // console.log("projectDetail form the getkanbanTaskUseCase", activeSprints)   
 
-        const allTasks: ITask[] = [];
+    const allTasks: ITask[] = [];
+
         for (const sprint of activeSprints) {
             const tasks = await this.sprintRepo.findFilterTaskInsprint(sprint._id!, assignees, epics);
+            console.log("tasksssssssssssssssfrom ", tasks)
             allTasks.push(...tasks);
         }
 
@@ -50,6 +52,7 @@ export class GetKanbanTaskUseCase {
                 statusGroup.tasks.push(task);
             }
         });
+
 
         return tasksByStatus;
     }

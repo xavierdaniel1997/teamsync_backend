@@ -66,7 +66,7 @@ export class SprintRepositoryImp implements ISprintRepository {
   async findFilterTaskInsprint(sprintId: string, assignees?: string[], epics?: string[]): Promise<ITask[]> {
     const sprint = await SprintModel.findById(sprintId)
     .populate({
-      path: "tasks",    
+      path: "tasks", 
       match: {
         ...(assignees && assignees.length > 0 ? { assignee: { $in: assignees } } : {}),
         ...(epics && epics.length > 0 ? { epic: { $in: epics } } : {}),
@@ -75,6 +75,7 @@ export class SprintRepositoryImp implements ISprintRepository {
         { path: "epic", select: "title taskKey" },
         { path: "assignee", select: "-password" },
         { path: "reporter", select: "-password" },
+        {path: "sprint"}
       ],              
     })
     .exec();
@@ -85,6 +86,10 @@ export class SprintRepositoryImp implements ISprintRepository {
 
     return sprint.tasks as unknown as ITask[];
   }
+
+
+
+
 
   async delete(id: string): Promise<void> {
     await SprintModel.findByIdAndDelete(id).exec();

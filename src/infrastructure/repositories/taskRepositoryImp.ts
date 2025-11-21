@@ -121,7 +121,7 @@ export class ITaskRepositoryImp implements ITaskRepository {
     }
 
     const tasks = await TaskModel.find(query)
-      .select('taskKey title description type status priority assignee reporter epic sprint storyPoints files createdAt updatedAt project workspace startDate endDate')
+      .select('taskKey title description type status priority assignee reporter epic sprint storyPoints files createdAt updatedAt project workspace startDate endDate webLinks')
       .populate({ path: 'epic', select: 'title taskKey' })
       .populate({ path: 'assignee', select: '-password' })
       .populate({ path: 'reporter', select: '-password' })

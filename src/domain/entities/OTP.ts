@@ -1,5 +1,5 @@
 export interface IOtp {
-    id?: string;
+    _id?: string;
     email: string;
     otp: string;
     expiresAt: Date;

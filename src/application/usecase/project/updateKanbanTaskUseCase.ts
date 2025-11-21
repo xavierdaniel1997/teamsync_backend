@@ -55,7 +55,6 @@ export class UpdateKanbanTaskUseCase {
         if(!updatedtask){
             throw new Error("Failed to update the task")
         }
-        console.log("project details form the updateKanbantask.............................", updatedtask)
 
         return updatedtask
     }

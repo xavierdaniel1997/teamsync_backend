@@ -10,6 +10,7 @@ export interface ISprintRepository {
   findByProject(projectId: string): Promise<ISprint[]>;
   addTask(sprintId: string, taskId: string): Promise<ISprint | null>;
   findFilterTaskInsprint(sprintId: string, assignees?: string[], epics?: string[]): Promise<ITask[]>;
+  // findFilterTaskInsprint(sprintId: string, assignees?: string[], epics?: string[]): Promise<{ sprint: ISprint, tasks: ITask[] }>;
   findTasksInSprint(sprintId: string): Promise<ITask[]>;
   delete(id: string): Promise<void>;
 }

@@ -190,14 +190,14 @@ export class UpdateTaskUseCase {
                     "Task Assignment",
                     dto.taskId,
                     dto.project,
-                    "TASK_ASSIGNED",
+                    "TASK_ASSIGNED",                     
                     NotificationStatus.WARNING
                 );
                 this.notificationService.notifyUser(assignNotification);
             }
         }
 
-        // console.log("from the update task usecase updateTask..", updatedTask)
+        console.log("from the update task usecase updateTask..", updatedTask)
 
         return updatedTask;
 
