@@ -13,6 +13,8 @@ import { setupChatSocket } from './interfaces/socket/chatSocket';
 import { setSocketIO } from './interfaces/controller/user/projectAndTeam/taskController';
 import { rateLimit } from 'express-rate-limit'
 
+dotenv.config()
+
 const app: Application = express()
 const server = createServer(app)
 const io = initializeSocket(server)
@@ -21,13 +23,14 @@ const io = initializeSocket(server)
    
 const PORT: Number = 5000;
     
-dotenv.config()
+
 configureCloudinary();
 connectDB()
 app.use(cookieParser())
 
 
-const allowedOrigins = process.env.CLIENT_ORIGIN
+// const allowedOrigins = process.env.CLIENT_ORIGIN
+const allowedOrigins = process.env.CLIENT_ORIGIN?.split(",") || [];
 console.log("allowedOrigin process.env.CLIENT_ORIGIN", process.env.CLIENT_ORIGIN)
 app.use(cors({
     origin : allowedOrigins,
