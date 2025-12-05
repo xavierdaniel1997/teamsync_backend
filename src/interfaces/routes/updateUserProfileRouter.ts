@@ -7,7 +7,7 @@ const router = express.Router()
 
 router.put("/update-profile", isAuth, upload.fields([{ name: 'avatar', maxCount: 1 },
 { name: 'coverPhoto', maxCount: 1 }]), updateProfile)
-router.get("/user-details", getUserDetilas)
+router.get("/user-details", isAuth, getUserDetilas)
 
 
 export default router;
