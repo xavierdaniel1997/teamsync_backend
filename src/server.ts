@@ -28,6 +28,7 @@ app.use(cookieParser())
 
 
 const allowedOrigins = process.env.CLIENT_ORIGIN
+console.log("allowedOrigin process.env.CLIENT_ORIGIN", process.env.CLIENT_ORIGIN)
 app.use(cors({
     origin : allowedOrigins,
     credentials : true,                
