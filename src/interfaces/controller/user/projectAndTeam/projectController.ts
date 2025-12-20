@@ -102,7 +102,7 @@ const updateProject = async (req: Request, res: Response): Promise<void> => {
 
 
 const getProjects = async (req: Request, res: Response): Promise<void> => {
-    const workspaceId = req.query.workspaceId as string;
+    const workspaceId = req.query.workspaceId as string;           
     try {
         const userId = (req as any).user?.userId;
         const result = await getWorkspaceProjectsUseCase.execute(workspaceId, userId)

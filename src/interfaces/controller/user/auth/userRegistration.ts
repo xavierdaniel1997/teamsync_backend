@@ -66,9 +66,9 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
             sameSite: "strict",
             maxAge: 2 * 24 * 60 * 60 * 1000,
         })
-
+        const expiresIn = 15 * 60; 
         res.setHeader("Authorization", `Bearer ${accessToken}`);
-        sendResponse(res, 200, { userDetial, accessToken }, "user registration complete successfully")
+        sendResponse(res, 200, { userDetial, accessToken, expiresIn }, "user registration complete successfully")
     } catch (error: any) {
         sendResponse(res, 400, null, error.message || "Failed to Register")
     }
@@ -89,10 +89,32 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
         })
 
         res.setHeader("Authorization", `Bearer ${accessToken}`);
-        sendResponse(res, 200, { userData, accessToken }, "user login successfully")
+        const expiresIn = 15 * 60; 
+        sendResponse(res, 200, { userData, accessToken, expiresIn }, "user login successfully")
     } catch (error: any) {
         sendResponse(res, 400, null, error.message || "Failed to Login")
     }
+}
+
+const googleLogin = async(req: Request, res: Response): Promise<void> => {
+    try{
+        const { access_token } = req.body;
+        if (!access_token) throw new Error("Access token not provided");
+        const result = await googleLoginUseCase.execute(access_token)
+        const {user, refreshToken, accessToken} = result;
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 2 * 24 * 60 * 60 * 1000,
+        })
+        const expiresIn = 15 * 60
+        res.setHeader("Authorization", `Bearer ${accessToken}`);
+        sendResponse(res, 200, { user, accessToken, expiresIn }, "user login successfully")
+    }catch(error: any){
+        sendResponse(res, 400, null, error.message || "Failed to Login")
+    }
+
 }
 
 const logoutUser = async (req: Request, res: Response): Promise<void> => {
@@ -145,25 +167,7 @@ const refreshAccessToken = async(req: Request, res: Response):Promise<void> => {
     }
 }
 
+    
 
-const googleLogin = async(req: Request, res: Response): Promise<void> => {
-    try{
-        const { access_token } = req.body;
-        if (!access_token) throw new Error("Access token not provided");
-        const result = await googleLoginUseCase.execute(access_token)
-        const {user, refreshToken, accessToken} = result;
-        res.cookie("refreshToken", refreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
-            maxAge: 2 * 24 * 60 * 60 * 1000,
-        })
-        res.setHeader("Authorization", `Bearer ${accessToken}`);
-        sendResponse(res, 200, { user, accessToken }, "user login successfully")
-    }catch(error: any){
-        sendResponse(res, 400, null, error.message || "Failed to Login")
-    }
-
-}
 
 export { sendOtpToEmail, verifyOtp, resendOtp, registerUser, loginUser, logoutUser, resetPassword, forgetPswViaEmail, refreshAccessToken, googleLogin}     
