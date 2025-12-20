@@ -48,7 +48,9 @@ const rateLimiter = rateLimit({
 // app.use("/api", rateLimiter)
 
 app.post("/api/webhook", express.raw({type: "application/json"}), handleWebhook)
-app.use(express.json())
+// app.use(express.json())
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.get("/", (req:Request, res:Response) => {
     res.json({message: "teamsync server test message"})
 })

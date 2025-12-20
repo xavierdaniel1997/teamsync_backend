@@ -66,6 +66,7 @@ const updateProfile = async (req: Request, res: Response): Promise<void> => {
 const getUserDetilas = async (req: Request, res: Response): Promise<void> => {
     try {
         const userId = (req as any).user?.userId;
+        console.log("checking the user details", userId)
         const userDetail = await userDetailsUseCase.execute(userId)
         let workspaceOwn = null
         try {
