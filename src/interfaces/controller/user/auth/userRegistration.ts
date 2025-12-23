@@ -117,6 +117,18 @@ const googleLogin = async(req: Request, res: Response): Promise<void> => {
 
 }
 
+const refreshAccessToken = async(req: Request, res: Response):Promise<void> => {
+    try{
+        const refreshToken = req.cookies.refreshToken;
+        console.log("refreshToken from the cookies", refreshToken)
+        const {accessToken} = await refreshTokenUseCase.execute(refreshToken)
+        res.setHeader("Authorization", `Bearer ${accessToken}`);
+        sendResponse(res, 200, { accessToken }, "Access token refreshed");
+    }catch(error: any){
+        sendResponse(res, 403, null, error.message || "Failed to refresh token");
+    }
+}
+
 const logoutUser = async (req: Request, res: Response): Promise<void> => {
     try {
         res.clearCookie("refreshToken", {
@@ -155,17 +167,7 @@ const resetPassword = async(req: Request, res: Response):Promise<void> => {
 }
 
 
-const refreshAccessToken = async(req: Request, res: Response):Promise<void> => {
-    try{
-        const refreshToken = req.cookies.refreshToken;
-        console.log("refreshToken from the cookies", refreshToken)
-        const {accessToken} = await refreshTokenUseCase.execute(refreshToken)
-        res.setHeader("Authorization", `Bearer ${accessToken}`);
-        sendResponse(res, 200, { accessToken }, "Access token refreshed");
-    }catch(error: any){
-        sendResponse(res, 403, null, error.message || "Failed to refresh token");
-    }
-}
+
 
     
 
