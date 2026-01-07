@@ -69,14 +69,14 @@ export class ITaskRepositoryImp implements ITaskRepository {
 
     return updatedTask as ITask | null;
   }
-
-  async delete(taskId: string): Promise<void> {
-    await TaskModel.findByIdAndDelete(taskId);
-  }
-
+  
   async updateMany(filter: any, update: Partial<ITask>): Promise<void> {
     await TaskModel.updateMany(filter, update).exec();
   }
+  
+  async delete(taskId: string): Promise<void> {
+      await TaskModel.findByIdAndDelete(taskId);
+    }
 
 
 
