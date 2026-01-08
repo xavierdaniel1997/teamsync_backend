@@ -37,7 +37,6 @@ export class GetKanbanTaskUseCase {
 
         for (const sprint of activeSprints) {
             const tasks = await this.sprintRepo.findFilterTaskInsprint(sprint._id!, assignees, epics);
-            console.log("tasksssssssssssssssfrom ", tasks)
             allTasks.push(...tasks);
         }
 

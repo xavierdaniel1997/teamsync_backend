@@ -1,5 +1,5 @@
 import mongoose, { UpdateQuery } from "mongoose";
-import { ISprint } from "../../domain/entities/sprint";
+import { ISprint, SprintStatus } from "../../domain/entities/sprint";
 import { ITask, TaskType } from "../../domain/entities/task";
 import { ISprintRepository } from "../../domain/repositories/sprintRepo";
 import SprintModel from "../database/sprintModel";
@@ -89,10 +89,15 @@ export class SprintRepositoryImp implements ISprintRepository {
 
 
 
-
-
   async delete(id: string): Promise<void> {
     await SprintModel.findByIdAndDelete(id).exec();
   }
 
-}
+
+  async findActiveSprintByProject(projectId: string): Promise<ISprint | null> {
+    return SprintModel.findOne({
+      project: projectId,
+      status: SprintStatus.ACTIVE
+    })
+  }
+}    

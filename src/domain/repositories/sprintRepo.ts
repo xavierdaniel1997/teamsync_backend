@@ -13,4 +13,5 @@ export interface ISprintRepository {
   // findFilterTaskInsprint(sprintId: string, assignees?: string[], epics?: string[]): Promise<{ sprint: ISprint, tasks: ITask[] }>;
   findTasksInSprint(sprintId: string): Promise<ITask[]>;
   delete(id: string): Promise<void>;
+  findActiveSprintByProject(projectId: string): Promise<ISprint | null>;
 }
