@@ -12,6 +12,7 @@ import { Server as SocketIOServer } from "socket.io";
 import { INotificationRepoImpl } from "../../../../infrastructure/repositories/notificationRepoImpl";
 import { NotificationSocketService } from "../../../../infrastructure/services/notificationSocketService";
 import { CreateNotificationUseCase } from "../../../../application/usecase/notificationUseCase/createNotificationUseCase";
+import { CompleteSprintUseCase } from "../../../../application/usecase/project/completeSprintUseCase";
 
 
 const sprintRepo = new SprintRepositoryImp()
@@ -29,7 +30,7 @@ const getSprintUseCase = new GetSprintUseCase(sprintRepo, projectRepo)
 const deleteSprintUseCase = new DeleteSprintUseCase(sprintRepo, projectRepo, taskRepo, workspaceRepo)
 // const startSprintUseCase = new StartSprintUseCase(sprintRepo, projectRepo, taskRepo, workspaceRepo)
 const startSprintUseCase = new StartSprintUseCase(sprintRepo, projectRepo, taskRepo, workspaceRepo, notificationUseCase, notificationService);
-
+const completeSprintUseCase = new CompleteSprintUseCase(sprintRepo, projectRepo, taskRepo, workspaceRepo);
 
 const createSprint = async (req: Request, res: Response) => {
     try {
@@ -86,8 +87,23 @@ const startSprint = async (req: Request, res: Response) => {
     }
 }   
         
+
+const completeSprint = async (req: Request, res: Response) => {
+    try{
+        const {moveIncompleteTo, targetSprintId} = req.body;
+        const {workspaceId, projectId, sprintId} = req.params;
+        const userId = (req as any).user?.userId;
+        if(!workspaceId || !projectId || !sprintId){
+            throw new Error("workspace , project or sprint _ids are missing")
+        }
+        const sprints = await completeSprintUseCase.execute(workspaceId, projectId, sprintId, userId, moveIncompleteTo, targetSprintId)
+        sendResponse(res, 200, null, "successfully complete the sprint")
+    }catch(error: any){
+        sendResponse(res, 400, null, error.message || "Failed to complete sprint")
+    }
+}
   
 
 
 
-export {createSprint, getSprints, deleteSprint, startSprint}  
+export {createSprint, getSprints, deleteSprint, startSprint, completeSprint}  

@@ -52,6 +52,7 @@ export interface ITask {
     files?: IFile[] | undefined;
     subtasks?: string[]; 
     webLinks?: Array<{ url: string; linkText: string }>; 
+    taskCompleted?: boolean;
     startDate?: Date;
     endDate?: Date; 
     createdAt: Date;

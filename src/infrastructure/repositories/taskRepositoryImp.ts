@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { SprintStatus } from "../../domain/entities/sprint";
-import { ITask, TaskType } from "../../domain/entities/task";
+import { ITask, TaskStatus, TaskType } from "../../domain/entities/task";
 import { ITaskRepository } from "../../domain/repositories/taskRepository";
 import SprintModel from "../database/sprintModel";
 import TaskModel from "../database/taskModel";
@@ -98,10 +98,15 @@ export class ITaskRepositoryImp implements ITaskRepository {
   }
 
 
+  async findTasksBySprintId(sprintId: string): Promise<ITask[]> {
+    return await TaskModel.find({sprint : sprintId})
+  }
+
   async findTaskByProjects(projectId: string, assignees?: string[], epics?: string[]): Promise<ITask[]> {
     const query: any = {
       project: projectId,
       type: { $ne: TaskType.EPIC },
+        status: { $ne: TaskStatus.DONE },
     };
 
     if (assignees && assignees.length > 0) {

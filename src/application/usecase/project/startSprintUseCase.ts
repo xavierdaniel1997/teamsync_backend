@@ -9,7 +9,7 @@ import { IWorkSpaceRepo } from "../../../domain/repositories/workSpaceRepo";
 import { NotificationService } from "../../../domain/services/notificationService";
 import { CreateNotificationUseCase } from "../notificationUseCase/createNotificationUseCase";
 
-export class StartSprintUseCase {
+export class StartSprintUseCase {  
   constructor(
     private sprintRepo: ISprintRepository,
     private projectRepo: IProjectRepo,

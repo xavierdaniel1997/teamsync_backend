@@ -27,12 +27,19 @@ export class SprintRepositoryImp implements ISprintRepository {
   }
 
 
-  async findByProject(projectId: string): Promise<ISprint[]> {
-    const sprints = await SprintModel.find({ project: projectId }).exec();
-    return sprints.map((sprint) => sprint.toObject());
-  }
+  // async findByProject(projectId: string): Promise<ISprint[]> {
+  //   const sprints = await SprintModel.find({ project: projectId }).exec();
+  //   return sprints.map((sprint) => sprint.toObject());
+  // }
 
-  
+  async findByProject(projectId: string): Promise<ISprint[]> {
+  const sprints = await SprintModel.find({
+    project: projectId,
+    status: { $in: [SprintStatus.PLANNED, SprintStatus.ACTIVE] },
+  }).exec();
+
+  return sprints.map((sprint) => sprint.toObject());
+}
 
 
   async addTask(sprintId: string, taskId: string): Promise<ISprint | null> {

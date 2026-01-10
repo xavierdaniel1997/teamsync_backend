@@ -3,7 +3,7 @@ import { isAuth } from '../middleware/authMiddleware';
 import { createProject, deleteProject, getProjectById, getProjectDetails, getProjects, inviteMemberToProject, updateProject } from '../controller/user/projectAndTeam/projectController';
 import { acceptInvitation } from '../controller/user/teamAndInvitation/invitationController';
 import { createTask, deleteTaskController, getAllTasksByProject, getEpicByProject, getTaskBySprintStatus, getTaskFromSprint, getTaskInBoard, getTasksController, updateTaskController, updateKanbanTask, getTaskInKanban } from '../controller/user/projectAndTeam/taskController';
-import { createSprint, deleteSprint, getSprints, startSprint } from '../controller/user/projectAndTeam/sprintController';
+import { completeSprint, createSprint, deleteSprint, getSprints, startSprint } from '../controller/user/projectAndTeam/sprintController';
 import { upload } from '../middleware/upload';
 
 const router = express.Router()
@@ -40,7 +40,7 @@ router.post("/create-sprint", isAuth, createSprint)
 router.get("/sprints/:projectId", isAuth, getSprints)
 router.delete("/delete-sprint/:workspaceId/:projectId/:sprintId", isAuth, deleteSprint)   
 router.post("/start-sprint/:workspaceId/:projectId/:sprintId", isAuth, startSprint)
-
+router.post("/complete-sprint/:workspaceId/:projectId/:sprintId", isAuth, completeSprint)
 
 
 export default router;    

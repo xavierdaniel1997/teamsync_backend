@@ -41,6 +41,7 @@ const taskSchema = new Schema<ITask & Document>({
     url: { type: String, required: true },
     linkText: { type: String, required: true }
   }],
+  taskCompleted: {type: Boolean, default : false},
   startDate: { type: Date },
   endDate: { type: Date },
   createdAt: { type: Date, default: Date.now },
